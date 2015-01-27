@@ -17,6 +17,7 @@ class ImageDisplayer extends JComponent {
 
     private ScalingAlgorithm scalingAlgorithm = ScalingAlgorithm.CENTER;
     private BufferedImage image = null;
+    private Image scaledImage = null;
 
     public ImageDisplayer() {
         //
@@ -25,12 +26,14 @@ class ImageDisplayer extends JComponent {
     public void setImage(File imageFile) {
         try {
             image = ImageIO.read(imageFile);
+
+            rebuildImage();
         }
         catch (IOException e) {
             e.printStackTrace();
             image = null;
+            scaledImage = null;
         }
-        repaintLater();
     }
 
     @Override
@@ -43,18 +46,14 @@ class ImageDisplayer extends JComponent {
         g2.setColor(Color.CYAN);
         g2.fillRect(0, 0, getWidth(), getHeight());
 
-        if (image != null) {
-
-            Dimension scaledDimension = ImageScalerUtils.getScaledImage(scalingAlgorithm, new Dimension(image.getWidth(), image.getHeight()), getSize());
-            Image scaled = image.getScaledInstance(scaledDimension.width, scaledDimension.height, Image.SCALE_FAST);
-
+        if (scaledImage != null) {
             int width = getWidth() - 1;
             int height = getHeight() - 1;
 
-            int x = (width - scaled.getWidth(this)) / 2;
-            int y = (height - scaled.getHeight(this)) / 2;
+            int x = (width - scaledImage.getWidth(this)) / 2;
+            int y = (height - scaledImage.getHeight(this)) / 2;
 
-            g2.drawImage(scaled, x, y, this);
+            g2.drawImage(scaledImage, x, y, this);
         }
 
         super.paintComponent(g);
@@ -62,15 +61,24 @@ class ImageDisplayer extends JComponent {
 
     public void setScalingAlgorithm(ScalingAlgorithm image1Size) {
         this.scalingAlgorithm = image1Size;
-        repaintLater();
+        rebuildImage();
     }
 
-    private void repaintLater() {
-        SwingUtilities.invokeLater(new Runnable() {
+    private void rebuildImage() {
+
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                ImageDisplayer.this.repaint();
+                Dimension scaledDimension = ImageScalerUtils.getScaledImage(scalingAlgorithm, new Dimension(image.getWidth(), image.getHeight()), getSize());
+                scaledImage = image.getScaledInstance(scaledDimension.width, scaledDimension.height, Image.SCALE_SMOOTH);
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ImageDisplayer.this.repaint();
+                    }
+                });
             }
-        });
+        }).start();
     }
 }
