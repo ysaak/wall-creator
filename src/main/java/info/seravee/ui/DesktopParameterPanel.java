@@ -18,8 +18,6 @@ import java.io.File;
  */
 class DesktopParameterPanel {
 
-    private final Rectangle desktop;
-
     private final JPanel mainPanel;
 
     private final JTextField filenameField;
@@ -31,9 +29,7 @@ class DesktopParameterPanel {
 
     private DesktopParameterListener listener = null;
 
-    public DesktopParameterPanel(Rectangle desktop) {
-        this.desktop = desktop;
-
+    public DesktopParameterPanel() {
         mainPanel = new JPanel();
 
         filenameField = new JTextField(20);

@@ -48,7 +48,7 @@ public class CreatorFrame {
     }
 
     private void buildImageSelectPanel(Rectangle config, final int nbDesktop) {
-        DesktopParameterPanel dpPanel = new DesktopParameterPanel(config);
+        DesktopParameterPanel dpPanel = new DesktopParameterPanel();
 
         final JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -57,7 +57,6 @@ public class CreatorFrame {
 
         tabbedPane.add("Desktop " + nbDesktop, panel);
 
-        //final ImageDisplayer imageDisplayer = new ImageDisplayer();
         desktopPanel.addScreen(nbDesktop, config);
 
         dpPanel.setListener(new DesktopParameterPanel.DesktopParameterListener() {
