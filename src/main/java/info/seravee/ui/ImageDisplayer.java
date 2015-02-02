@@ -19,8 +19,10 @@ class ImageDisplayer extends JComponent {
     private BufferedImage image = null;
     private Image scaledImage = null;
 
-    public ImageDisplayer() {
-        //
+    private final Rectangle screenData;
+
+    public ImageDisplayer(Rectangle screenData) {
+        this.screenData = screenData;
     }
 
     public void setImage(File imageFile) {
@@ -28,8 +30,7 @@ class ImageDisplayer extends JComponent {
             image = ImageIO.read(imageFile);
 
             rebuildImage();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             image = null;
             scaledImage = null;
@@ -38,8 +39,10 @@ class ImageDisplayer extends JComponent {
 
     @Override
     protected void paintComponent(Graphics g) {
-        Graphics2D g2 =(Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Color oldColor = g.getColor();
 
         g2.clearRect(0, 0, getWidth(), getHeight());
 
@@ -56,7 +59,13 @@ class ImageDisplayer extends JComponent {
             g2.drawImage(scaledImage, x, y, this);
         }
 
-        super.paintComponent(g);
+
+        g.setColor(Color.BLACK);
+        g.drawRect(0, 0, getWidth()-1, getHeight()-1);
+
+        g.setColor(oldColor);
+
+        //super.paintComponent(g);
     }
 
     public void setScalingAlgorithm(ScalingAlgorithm image1Size) {
@@ -65,7 +74,9 @@ class ImageDisplayer extends JComponent {
     }
 
     private void rebuildImage() {
-
+        if (image == null) {
+            return;
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -80,5 +91,9 @@ class ImageDisplayer extends JComponent {
                 });
             }
         }).start();
+    }
+
+    public Rectangle getScreenData() {
+        return screenData;
     }
 }

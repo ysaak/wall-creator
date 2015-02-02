@@ -5,6 +5,7 @@ import info.seravee.data.ScalingAlgorithm;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by ysaak on 27/01/15.
@@ -13,27 +14,20 @@ public class CreatorFrame {
 
     private final JFrame frame;
 
-    private final ImageDisplayer imageDisplayer;
-    private final DesktopParameterPanel desktop1ParameterPanel;
+    private final DesktopPanel desktopPanel;
+
+    private final JTabbedPane tabbedPane;
 
     public CreatorFrame() {
         frame = new JFrame("Wall creator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        imageDisplayer = new ImageDisplayer();
-        desktop1ParameterPanel = new DesktopParameterPanel();
+        desktopPanel = new DesktopPanel();
+    /*
 
-        desktop1ParameterPanel.setListener(new DesktopParameterPanel.DesktopParameterListener() {
-            @Override
-            public void imageSelected(File imageFile) {
-                imageDisplayer.setImage(imageFile);
-            }
+        */
 
-            @Override
-            public void scalingAlgorithmSelected(ScalingAlgorithm algorithm) {
-                imageDisplayer.setScalingAlgorithm(algorithm);
-            }
-        });
+        tabbedPane = new JTabbedPane();
 
         buildFrame();
         frame.setSize(new Dimension(700, 500));
@@ -44,21 +38,42 @@ public class CreatorFrame {
         JComponent contentPane = (JComponent) frame.getContentPane();
         contentPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(10, 10));
-
-        contentPane.add(imageDisplayer, BorderLayout.CENTER);
-
-        final JPanel parametersPanel = new JPanel(new BorderLayout(10, 10));
-        parametersPanel.add(buildImageSelectPanel(desktop1ParameterPanel, 1), BorderLayout.WEST);
-
-        contentPane.add(parametersPanel, BorderLayout.SOUTH);
+        
+        contentPane.add(desktopPanel, BorderLayout.CENTER);
+        contentPane.add(tabbedPane, BorderLayout.SOUTH);
     }
 
-    private JPanel buildImageSelectPanel(DesktopParameterPanel dpPanel, int nbDesktop) {
+    public void setDesktopConfig(List<Rectangle> config) {
+        int i = 0;
+        for (Rectangle dc : config) {
+            buildImageSelectPanel(dc, ++i);
+        }
+    }
+
+    private void buildImageSelectPanel(Rectangle config, final int nbDesktop) {
+        DesktopParameterPanel dpPanel = new DesktopParameterPanel(config);
+
         final JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Desktop " + nbDesktop));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         dpPanel.build();
         panel.add(dpPanel.getDisplay(), BorderLayout.CENTER);
-        return panel;
+
+        tabbedPane.add("Desktop " + nbDesktop, panel);
+
+        //final ImageDisplayer imageDisplayer = new ImageDisplayer();
+        desktopPanel.addScreen(nbDesktop, config);
+
+        dpPanel.setListener(new DesktopParameterPanel.DesktopParameterListener() {
+            @Override
+            public void imageSelected(File imageFile) {
+                desktopPanel.setImage(nbDesktop, imageFile);
+            }
+
+            @Override
+            public void scalingAlgorithmSelected(ScalingAlgorithm algorithm) {
+                desktopPanel.setScalingAlgorithm(nbDesktop, algorithm);
+            }
+        });
     }
 
     public void show() {
