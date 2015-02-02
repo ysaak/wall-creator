@@ -18,6 +18,8 @@ class ImageDisplayer extends JComponent {
     private ScalingAlgorithm scalingAlgorithm = ScalingAlgorithm.CENTER;
     private BufferedImage image = null;
     private Image scaledImage = null;
+    
+    private double displayScaleRatio = 1.0;
 
     private final Rectangle screenData;
 
@@ -80,7 +82,11 @@ class ImageDisplayer extends JComponent {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Dimension scaledDimension = ImageScalerUtils.getScaledImage(scalingAlgorithm, new Dimension(image.getWidth(), image.getHeight()), getSize());
+                final Dimension initialDimensions = new Dimension((int) (image.getWidth() * displayScaleRatio), (int) (image.getHeight() * displayScaleRatio));
+                
+                scaledImage = image.getScaledInstance(initialDimensions.width, initialDimensions.height, Image.SCALE_SMOOTH);
+                
+                Dimension scaledDimension = ImageScalerUtils.getScaledImage(scalingAlgorithm, initialDimensions, getSize());
                 scaledImage = image.getScaledInstance(scaledDimension.width, scaledDimension.height, Image.SCALE_SMOOTH);
 
                 SwingUtilities.invokeLater(new Runnable() {
@@ -91,6 +97,10 @@ class ImageDisplayer extends JComponent {
                 });
             }
         }).start();
+    }
+
+    public void setDisplayScaleRatio(double displayScaleRatio) {
+        this.displayScaleRatio = displayScaleRatio;
     }
 
     public Rectangle getScreenData() {

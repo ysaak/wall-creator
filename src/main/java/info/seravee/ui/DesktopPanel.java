@@ -71,6 +71,7 @@ public class DesktopPanel extends JComponent {
             r.width = (int) (r.width * scaleRatio);
             r.height = (int) (r.height * scaleRatio);
 
+            id.setDisplayScaleRatio(scaleRatio);
             id.setBounds(r);
 
             System.out.println("ID bounds = " + r);
