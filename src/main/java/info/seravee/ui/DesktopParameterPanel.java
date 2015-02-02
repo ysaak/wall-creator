@@ -1,5 +1,6 @@
 package info.seravee.ui;
 
+import info.seravee.DefaultConfiguration;
 import info.seravee.data.ScalingAlgorithm;
 import info.seravee.utils.FileUtils;
 
@@ -8,6 +9,8 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 
 /**
@@ -22,6 +25,9 @@ class DesktopParameterPanel {
     private final JTextField filenameField;
     private final JButton chooseFileButton;
     private final JComboBox scalingAlgoField;
+    
+    private final JLabel colorDisplayLabel;
+    private final JButton colorChooserButton;
 
     private DesktopParameterListener listener = null;
 
@@ -32,6 +38,14 @@ class DesktopParameterPanel {
 
         filenameField = new JTextField(20);
         filenameField.setEditable(false);
+        filenameField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() >= 2) {
+                    chooseFileButton.doClick();
+                }
+            }
+        });
 
         chooseFileButton = new JButton("Select image");
         chooseFileButton.addActionListener(new ActionListener() {
@@ -73,6 +87,32 @@ class DesktopParameterPanel {
                 }
             }
         });
+
+        
+        colorDisplayLabel = new JLabel("      ");
+        colorDisplayLabel.setOpaque(true);
+        colorDisplayLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        colorDisplayLabel.setBackground(DefaultConfiguration.BACKGROUND_COLOR);
+        colorDisplayLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                colorChooserButton.doClick();
+            }
+        });
+        
+        colorChooserButton = new JButton("Select color");
+        colorChooserButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Color c = JColorChooser.showDialog(null, "Choose a Color", colorDisplayLabel.getBackground());
+                if (c != null) {
+                    colorDisplayLabel.setBackground(c);
+                    if (listener != null) {
+                        listener.backgroundColorSelected(c);
+                    }
+                }
+            }
+        });
     }
 
     public void build() {
@@ -102,6 +142,18 @@ class DesktopParameterPanel {
         c.gridwidth = 2;
         c.fill = GridBagConstraints.HORIZONTAL;
         mainPanel.add(scalingAlgoField, c);
+        
+        
+        c.gridy = 2;
+        c.gridwidth = 1;
+        c.gridx = 0;
+        mainPanel.add(new JLabel("Color:", SwingConstants.TRAILING), c);
+        
+        c.gridx = 1;
+        mainPanel.add(colorDisplayLabel, c);
+        
+        c.gridx = 2;
+        mainPanel.add(colorChooserButton, c);
     }
 
     public JComponent getDisplay() {
@@ -132,5 +184,6 @@ class DesktopParameterPanel {
     public interface DesktopParameterListener {
         public void imageSelected(File imageFile);
         public void scalingAlgorithmSelected(ScalingAlgorithm algorithm);
+        public void backgroundColorSelected(Color backgroundColor);
     }
 }

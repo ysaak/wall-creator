@@ -1,5 +1,6 @@
 package info.seravee.ui;
 
+import info.seravee.DefaultConfiguration;
 import info.seravee.data.ScalingAlgorithm;
 import info.seravee.utils.ImageScalerUtils;
 
@@ -15,7 +16,7 @@ import java.io.IOException;
  */
 class ImageDisplayer extends JComponent {
 
-    private ScalingAlgorithm scalingAlgorithm = ScalingAlgorithm.CENTER;
+    private ScalingAlgorithm scalingAlgorithm = DefaultConfiguration.SCALING_ALGORITHM;
     private BufferedImage image = null;
     private Image scaledImage = null;
     
@@ -25,20 +26,9 @@ class ImageDisplayer extends JComponent {
 
     public ImageDisplayer(Rectangle screenData) {
         this.screenData = screenData;
+        setBackground(DefaultConfiguration.BACKGROUND_COLOR);
     }
-
-    public void setImage(File imageFile) {
-        try {
-            image = ImageIO.read(imageFile);
-
-            rebuildImage();
-        } catch (IOException e) {
-            e.printStackTrace();
-            image = null;
-            scaledImage = null;
-        }
-    }
-
+    
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
@@ -48,7 +38,7 @@ class ImageDisplayer extends JComponent {
 
         g2.clearRect(0, 0, getWidth(), getHeight());
 
-        g2.setColor(Color.CYAN);
+        g2.setColor(getBackground());
         g2.fillRect(0, 0, getWidth(), getHeight());
 
         if (scaledImage != null) {
@@ -70,11 +60,29 @@ class ImageDisplayer extends JComponent {
         //super.paintComponent(g);
     }
 
+    public void setImage(File imageFile) {
+        try {
+            image = ImageIO.read(imageFile);
+
+            rebuildImage();
+        } catch (IOException e) {
+            e.printStackTrace();
+            image = null;
+            scaledImage = null;
+        }
+    }
+
     public void setScalingAlgorithm(ScalingAlgorithm image1Size) {
         this.scalingAlgorithm = image1Size;
         rebuildImage();
     }
 
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+        repaint();
+    }
+    
     private void rebuildImage() {
         if (image == null) {
             return;

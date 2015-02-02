@@ -23,9 +23,6 @@ public class CreatorFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         desktopPanel = new DesktopPanel();
-    /*
-
-        */
 
         tabbedPane = new JTabbedPane();
 
@@ -72,6 +69,11 @@ public class CreatorFrame {
             @Override
             public void scalingAlgorithmSelected(ScalingAlgorithm algorithm) {
                 desktopPanel.setScalingAlgorithm(nbDesktop, algorithm);
+            }
+
+            @Override
+            public void backgroundColorSelected(Color backgroundColor) {
+                desktopPanel.setBackgroundColor(nbDesktop, backgroundColor);
             }
         });
     }

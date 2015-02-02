@@ -104,4 +104,10 @@ public class DesktopPanel extends JComponent {
             screens.get(no).setScalingAlgorithm(algorithm);
         }
     }
+    
+    public void setBackgroundColor(int no, Color backgroundColor) {
+        if (screens.containsKey(no)) {
+            screens.get(no).setBackground(backgroundColor);
+        }
+    }
 }
