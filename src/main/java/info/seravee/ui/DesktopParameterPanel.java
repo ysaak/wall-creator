@@ -71,7 +71,7 @@ class DesktopParameterPanel {
         });
 
         scalingAlgoField = new JComboBox(ScalingAlgorithm.values());
-        scalingAlgoField.setSelectedIndex(0);
+        scalingAlgoField.setSelectedIndex(ScalingAlgorithm.indexOf(DefaultConfiguration.SCALING_ALGORITHM));
         scalingAlgoField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
