@@ -2,8 +2,13 @@ package info.seravee.ui;
 
 import info.seravee.data.ScalingAlgorithm;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 
@@ -17,6 +22,8 @@ public class CreatorFrame {
     private final DesktopPanel desktopPanel;
 
     private final JTabbedPane tabbedPane;
+    
+    private final JButton saveImageButton;
 
     public CreatorFrame() {
         frame = new JFrame("Wall creator");
@@ -25,6 +32,29 @@ public class CreatorFrame {
         desktopPanel = new DesktopPanel();
 
         tabbedPane = new JTabbedPane();
+        
+        saveImageButton = new JButton("Save image");
+        saveImageButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                final JFileChooser fc = new JFileChooser();
+                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG Image (.png)", "png"));
+                fc.setAcceptAllFileFilterUsed(false);
+
+                int returnVal = fc.showSaveDialog(frame);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    
+                    if (!file.getName().endsWith(".png")) {
+                        file = new File(file.getAbsolutePath() + ".png");
+                    }
+
+                    new SaveImageWorker(file).execute();
+                }
+            }
+        });
 
         buildFrame();
         frame.setSize(new Dimension(700, 500));
@@ -37,7 +67,13 @@ public class CreatorFrame {
         contentPane.setLayout(new BorderLayout(10, 10));
         
         contentPane.add(desktopPanel, BorderLayout.CENTER);
-        contentPane.add(tabbedPane, BorderLayout.SOUTH);
+        
+        
+        JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
+        bottomPanel.add(tabbedPane, BorderLayout.CENTER);
+        bottomPanel.add(saveImageButton, BorderLayout.SOUTH);
+
+        contentPane.add(bottomPanel, BorderLayout.SOUTH);
     }
 
     public void setDesktopConfig(List<Rectangle> config) {
@@ -79,5 +115,35 @@ public class CreatorFrame {
 
     public void show() {
         frame.setVisible(true);
+    }
+    
+    private class SaveImageWorker extends SwingWorker<Void, Void> {
+        private final File imageFile;
+        public SaveImageWorker(File imageFile) {
+            this.imageFile = imageFile;
+        }
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            
+            Dimension screensDim = desktopPanel.getScreensDimension();
+
+            BufferedImage bi = new BufferedImage(screensDim.width, screensDim.height, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D g2 = bi.createGraphics();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0, 0, screensDim.width, screensDim.height);
+            
+            for (ImageDisplayer id : desktopPanel.getDisplayers()) {
+                
+                Image idI = id.getScaledImage();
+                g2.drawImage(idI, id.getScreenData().x, id.getScreenData().y, null);
+            }
+
+            ImageIO.write(bi, "PNG", imageFile);
+            return null;
+        }
     }
 }

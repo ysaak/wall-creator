@@ -6,6 +6,7 @@ import info.seravee.utils.ImageScalerUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,5 +110,13 @@ public class DesktopPanel extends JComponent {
         if (screens.containsKey(no)) {
             screens.get(no).setBackground(backgroundColor);
         }
+    }
+
+    public Dimension getScreensDimension() {
+        return screensDim;
+    }
+    
+    public Collection<ImageDisplayer> getDisplayers() {
+        return screens.values();
     }
 }

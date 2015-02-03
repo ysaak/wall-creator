@@ -26,6 +26,7 @@ class ImageDisplayer extends JComponent {
 
     public ImageDisplayer(Rectangle screenData) {
         this.screenData = screenData;
+        System.out.println("Screen data init = " + screenData);
         setBackground(DefaultConfiguration.BACKGROUND_COLOR);
     }
     
@@ -112,6 +113,35 @@ class ImageDisplayer extends JComponent {
     }
 
     public Rectangle getScreenData() {
-        return screenData;
+        return new Rectangle(screenData);
+    }
+    
+    public Image getScaledImage() {
+        System.out.println("Save time sD = " + screenData);
+        BufferedImage bi = new BufferedImage(screenData.width, screenData.height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = bi.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        g2.setColor(getBackground());
+        g2.fillRect(0, 0, screenData.width, screenData.height);
+
+        if (image != null) {
+            Dimension scaledDimension = ImageScalerUtils.getScaledImage(scalingAlgorithm, new Dimension(image.getWidth(), image.getHeight()), screenData.getSize());
+            System.out.println("Scaled dim = " + scaledDimension);
+            Image scaledImg = image.getScaledInstance(scaledDimension.width, scaledDimension.height, Image.SCALE_SMOOTH);
+
+            int width = screenData.width - 1;
+            int height = screenData.height - 1;
+
+            int x = (width - scaledImg.getWidth(this)) / 2;
+            int y = (height - scaledImg.getHeight(this)) / 2;
+
+            g2.drawImage(scaledImg, x, y, this);
+        }
+
+        System.out.println("IdI size = " + bi.getWidth(null) + " x " + bi.getHeight(null));
+        
+        
+        return bi;
     }
 }
