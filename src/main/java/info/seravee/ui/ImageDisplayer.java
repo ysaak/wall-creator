@@ -26,7 +26,6 @@ class ImageDisplayer extends JComponent {
 
     public ImageDisplayer(Rectangle screenData) {
         this.screenData = screenData;
-        System.out.println("Screen data init = " + screenData);
         setBackground(DefaultConfiguration.BACKGROUND_COLOR);
     }
     
@@ -57,8 +56,6 @@ class ImageDisplayer extends JComponent {
         g.drawRect(0, 0, getWidth()-1, getHeight()-1);
 
         g.setColor(oldColor);
-
-        //super.paintComponent(g);
     }
 
     public void setImage(File imageFile) {
@@ -117,7 +114,6 @@ class ImageDisplayer extends JComponent {
     }
     
     public Image getScaledImage() {
-        System.out.println("Save time sD = " + screenData);
         BufferedImage bi = new BufferedImage(screenData.width, screenData.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bi.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -127,7 +123,6 @@ class ImageDisplayer extends JComponent {
 
         if (image != null) {
             Dimension scaledDimension = ImageScalerUtils.getScaledImage(scalingAlgorithm, new Dimension(image.getWidth(), image.getHeight()), screenData.getSize());
-            System.out.println("Scaled dim = " + scaledDimension);
             Image scaledImg = image.getScaledInstance(scaledDimension.width, scaledDimension.height, Image.SCALE_SMOOTH);
 
             int width = screenData.width - 1;
@@ -139,9 +134,6 @@ class ImageDisplayer extends JComponent {
             g2.drawImage(scaledImg, x, y, this);
         }
 
-        System.out.println("IdI size = " + bi.getWidth(null) + " x " + bi.getHeight(null));
-        
-        
         return bi;
     }
 }

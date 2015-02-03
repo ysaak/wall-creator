@@ -55,17 +55,12 @@ class DesktopParameterPanel {
                 int returnVal = fc.showOpenDialog(mainPanel);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    //This is where a real application would open the file.
-                    System.out.println("Opening: " + file.getName() + ".");
 
                     filenameField.setText(file.getAbsolutePath());
 
                     if (listener != null) {
                         listener.imageSelected(file);
                     }
-                }
-                else {
-                    System.out.println("Open command cancelled by user.");
                 }
             }
         });

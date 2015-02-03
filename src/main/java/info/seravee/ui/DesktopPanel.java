@@ -30,39 +30,23 @@ public class DesktopPanel extends JComponent {
         // Compute data
         for (ImageDisplayer id : screens.values()) {
             final Rectangle sc = id.getScreenData();
-            System.out.println("New screen data = " + sc);
             screensDim.width = Math.max(screensDim.width, sc.width + sc.x);
             screensDim.height = Math.max(screensDim.height, sc.height + sc.y);
         }
 
-        System.out.println("add screen = " + screensDim.width + " x " + screensDim.height);
-
         add(screens.get(number));
-
-        //setComponentBounds();
     }
 
     private void setComponentBounds() {
-        System.out.println("comp ori dom = " + getSize());
-
         final Dimension compDim = new Dimension(getWidth() - 2 * BORDER_WIDTH, getHeight() - 2 * BORDER_WIDTH);
-
-        System.out.println("comp dim = " + compDim);
-
 
         final Dimension scaledDim = ImageScalerUtils.getScaledImage(ScalingAlgorithm.STRETCH_KEEP_PROPORTION_NO_CROP,
                 screensDim, compDim);
-        System.out.println("scaled dim = " + scaledDim);
-
 
         final double scaleRatio = scaledDim.getWidth() / screensDim.getWidth();
 
-        System.out.println("scale ratio = " + scaleRatio);
-
         final int x = (getWidth() - scaledDim.width) / 2;
         final int y = (getHeight() - scaledDim.height) / 2;
-
-        System.out.println("(x,y) = (" + x + "," + y + ")");
 
         for (ImageDisplayer id : screens.values()) {
             Rectangle r = id.getScreenData();
@@ -74,8 +58,6 @@ public class DesktopPanel extends JComponent {
 
             id.setDisplayScaleRatio(scaleRatio);
             id.setBounds(r);
-
-            System.out.println("ID bounds = " + r);
         }
     }
 
