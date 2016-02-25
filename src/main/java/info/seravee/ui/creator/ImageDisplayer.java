@@ -1,22 +1,31 @@
-package info.seravee.ui;
+package info.seravee.ui.creator;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import info.seravee.DefaultConfiguration;
 import info.seravee.data.ScalingAlgorithm;
 import info.seravee.utils.ImageScalerUtils;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
 /**
  * Created by ysaak on 27/01/15.
  */
-class ImageDisplayer extends JComponent {
-
-    private ScalingAlgorithm scalingAlgorithm = DefaultConfiguration.SCALING_ALGORITHM;
+public class ImageDisplayer extends JComponent {
+	private static final long serialVersionUID = 1L;
+	
+	private ScalingAlgorithm scalingAlgorithm = DefaultConfiguration.SCALING_ALGORITHM;
     private BufferedImage image = null;
     private Image scaledImage = null;
     

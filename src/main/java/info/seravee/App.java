@@ -15,6 +15,13 @@ public class App
     CreatorFrame frame;
 
     public App() {
+    	/*
+    	try {
+    		// Set System L&F
+	        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    } 
+    	catch (Exception e) { }
+    	*/
         frame = new CreatorFrame();
 
         final Platform p = Platforms.get();

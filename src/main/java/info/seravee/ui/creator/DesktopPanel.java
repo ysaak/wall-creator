@@ -1,4 +1,4 @@
-package info.seravee.ui;
+package info.seravee.ui.creator;
 
 import info.seravee.data.ScalingAlgorithm;
 import info.seravee.utils.ImageScalerUtils;
@@ -14,8 +14,9 @@ import java.util.Map;
  * Created by ysaak on 01/02/15.
  */
 public class DesktopPanel extends JComponent {
+	private static final long serialVersionUID = -8461734317635643191L;
 
-    private static final int BORDER_WIDTH = 20;
+	private static final int BORDER_WIDTH = 20;
 
     private Map<Integer, ImageDisplayer> screens = new HashMap<Integer, ImageDisplayer>();
 

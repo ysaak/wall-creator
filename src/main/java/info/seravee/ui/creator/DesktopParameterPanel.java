@@ -1,22 +1,33 @@
-package info.seravee.ui;
+package info.seravee.ui.creator;
 
-import info.seravee.DefaultConfiguration;
-import info.seravee.data.ScalingAlgorithm;
-import info.seravee.utils.FileUtils;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
+import info.seravee.DefaultConfiguration;
+import info.seravee.business.files.ImageFilter;
+import info.seravee.data.ScalingAlgorithm;
+
 /**
  * Created by ysaak on 27/01/15.
  */
-class DesktopParameterPanel {
+public class DesktopParameterPanel {
 
     private final JPanel mainPanel;
 
@@ -154,24 +165,7 @@ class DesktopParameterPanel {
     public void setListener(DesktopParameterListener listener) {
         this.listener = listener;
     }
-
-    private class ImageFilter extends FileFilter {
-        @Override
-        public boolean accept(File f) {
-            if (f.isDirectory()) {
-                return true;
-            }
-
-            String extension = FileUtils.getExtension(f);
-            return extension != null && FileUtils.IMAGE_EXTENSIONS.contains(extension.toLowerCase());
-        }
-
-        @Override
-        public String getDescription() {
-            return "Image files";
-        }
-    }
-
+    
     public interface DesktopParameterListener {
         public void imageSelected(File imageFile);
         public void scalingAlgorithmSelected(ScalingAlgorithm algorithm);

@@ -1,4 +1,4 @@
-package info.seravee.utils;
+package info.seravee.business.files;
 
 import java.io.File;
 import java.util.Arrays;

@@ -6,6 +6,6 @@ package info.seravee.platform;
 public class Platforms {
 
     public static Platform get() {
-        return new FakePlatform();
+        return new WindowsPlatform();
     }
 }
