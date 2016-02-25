@@ -6,3 +6,6 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 wall-creator.iml
+.classpath
+.project
+.settings
