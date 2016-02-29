@@ -2,7 +2,7 @@ package info.seravee;
 
 import javax.swing.SwingUtilities;
 
-import info.seravee.business.Configuration;
+import info.seravee.business.config.ConfigurationManager;
 import info.seravee.business.exceptions.ConfigurationException;
 import info.seravee.platform.Platform;
 import info.seravee.platform.Platforms;
@@ -17,11 +17,12 @@ public class App
     CreatorFrame frame;
 
     public App() {
+    	// Load configuration
     	try {
-			Configuration.get().initPaths();
+			ConfigurationManager.load();
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
-			System.exit(0);
+			System.exit(-1);
 		}
     	
     	//ThumbnailManager.purgeThumbnails();
