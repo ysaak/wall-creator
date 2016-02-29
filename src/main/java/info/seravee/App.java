@@ -1,10 +1,12 @@
 package info.seravee;
 
+import javax.swing.SwingUtilities;
+
+import info.seravee.business.Configuration;
+import info.seravee.business.exceptions.ConfigurationException;
 import info.seravee.platform.Platform;
 import info.seravee.platform.Platforms;
 import info.seravee.ui.CreatorFrame;
-
-import javax.swing.*;
 
 /**
  * Hello world!
@@ -15,6 +17,15 @@ public class App
     CreatorFrame frame;
 
     public App() {
+    	try {
+			Configuration.get().initPaths();
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+    	
+    	//ThumbnailManager.purgeThumbnails();
+    	
     	/*
     	try {
     		// Set System L&F

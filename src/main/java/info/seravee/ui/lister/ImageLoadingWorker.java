@@ -15,6 +15,7 @@ import javax.swing.SwingWorker;
 
 import info.seravee.DefaultConfiguration;
 import info.seravee.business.files.ImageFilter;
+import info.seravee.business.files.ThumbnailManager;
 import info.seravee.data.lister.Wallpaper;
 import info.seravee.utils.ImageScalerUtils;
 
@@ -55,20 +56,44 @@ class ImageLoadingWorker extends SwingWorker<Void, Wallpaper> {
 			if (isCancelled()) return null;
 			
 			if (!file.isDirectory()) {
-				try {
-					final BufferedImage image = ImageIO.read(file);
-		            
-					publish(new Wallpaper(file, 
-		            		ImageScalerUtils.getScaledImage(
-		            				image, 
-		            				DefaultConfiguration.SCALING_ALGORITHM, 
-		            				new Dimension(DefaultConfiguration.THUMBNAIL_WIDTH, DefaultConfiguration.THUMBNAIL_HEIGHT)
-		            		)
-		            ));
-		        }
-				catch (IOException e) {
-		            e.printStackTrace();
-		        }
+				BufferedImage image;
+				Wallpaper wp = null;
+				
+				// Try to load thumbnail
+				image = ThumbnailManager.getThumbnail(file);
+				
+				if (image != null) {
+					// Thumbnail exists, let's use it
+					wp = new Wallpaper(file, image);
+				}
+				else {
+					try {
+						image = ImageIO.read(file);
+						
+						wp = new Wallpaper(file, 
+								ImageScalerUtils.getScaledImage(
+										image, 
+										DefaultConfiguration.SCALING_ALGORITHM, 
+										new Dimension(DefaultConfiguration.THUMBNAIL_WIDTH, DefaultConfiguration.THUMBNAIL_HEIGHT)
+										)
+								);
+						
+						
+					}
+					catch (IOException e) {
+						wp = null;
+						e.printStackTrace();
+					}
+					
+					if (wp != null) {
+						System.out.println("Writing thumbnail");
+						ThumbnailManager.writeThumbnailFile(wp.getFile(), wp.getImage());
+					}
+				}
+
+				if (wp != null) {
+					publish(wp);
+				}
 			}
 		}
 		

@@ -1,14 +1,24 @@
 package info.seravee.platform;
 
-import java.awt.*;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by ysaak on 31/01/15.
  */
-class AbstractPlaform implements Platform {
-
+abstract class AbstractPlaform implements Platform {
+	
+	public Path getAppDirectory() {
+		String userHome = System.getProperty("user.home");
+		return Paths.get(userHome, ".wall-creator");
+	}
+	
     public List<Rectangle> getDesktopConfiguration() {
 
         List<Rectangle> config = new ArrayList<Rectangle>();

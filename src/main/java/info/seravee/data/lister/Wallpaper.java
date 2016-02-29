@@ -1,14 +1,14 @@
 package info.seravee.data.lister;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class Wallpaper {
 	
 	private final File file;
-	private final Image image;
+	private final BufferedImage image;
 	
-	public Wallpaper(File file, Image image) {
+	public Wallpaper(File file, BufferedImage image) {
 		super();
 		this.file = file;
 		this.image = image;
@@ -18,7 +18,7 @@ public class Wallpaper {
 		return file;
 	}
 
-	public Image getImage() {
+	public BufferedImage getImage() {
 		return image;
 	}
 	
