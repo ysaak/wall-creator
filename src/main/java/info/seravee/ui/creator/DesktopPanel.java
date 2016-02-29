@@ -1,105 +1,138 @@
 package info.seravee.ui.creator;
 
-import info.seravee.data.ScalingAlgorithm;
-import info.seravee.utils.ImageScalerUtils;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/**
- * Created by ysaak on 01/02/15.
- */
-public class DesktopPanel extends JComponent {
-	private static final long serialVersionUID = -8461734317635643191L;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-	private static final int BORDER_WIDTH = 20;
+import info.seravee.business.workers.SaveImageWorker;
+import info.seravee.data.ScalingAlgorithm;
 
-    private Map<Integer, ImageDisplayer> screens = new HashMap<Integer, ImageDisplayer>();
+public class DesktopPanel {
+	private final JPanel desktopPanel;
+	
+	private final ScreensViewPanel screensViewPanel;
+	
+	private final JTabbedPane tabbedPane;
+	
+	private final JButton saveImageButton;
+	
+	private final Map<Integer, DesktopParameterPanel> desktopParamsMap;
+	
+	public DesktopPanel() {
+		desktopParamsMap = new HashMap<>();
+		
+		desktopPanel = new JPanel(new BorderLayout(5,5));
+		
+		screensViewPanel = new ScreensViewPanel();
+		
+		tabbedPane = new JTabbedPane();
+		
 
-    boolean initComplete = false;
+        
+        saveImageButton = new JButton("Save image");
+        saveImageButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
-    // Cal vars
-    private Dimension screensDim = new Dimension(0, 0);
+                final JFileChooser fc = new JFileChooser();
+                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG Image (.png)", "png"));
+                fc.setAcceptAllFileFilterUsed(false);
 
-    public void addScreen(int number, Rectangle config) {
-        screens.put(number, new ImageDisplayer(config));
+                int returnVal = fc.showSaveDialog(desktopPanel);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    
+                    if (!file.getName().endsWith(".png")) {
+                        file = new File(file.getAbsolutePath() + ".png");
+                    }
 
-        // Compute data
-        for (ImageDisplayer id : screens.values()) {
-            final Rectangle sc = id.getScreenData();
-            screensDim.width = Math.max(screensDim.width, sc.width + sc.x);
-            screensDim.height = Math.max(screensDim.height, sc.height + sc.y);
+                    new SaveImageWorker(file, screensViewPanel.getData()).execute();
+                }
+            }
+        });
+	}
+	
+	public void buildPanel() {
+		desktopPanel.add(screensViewPanel, BorderLayout.CENTER);
+
+		JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
+        bottomPanel.add(tabbedPane, BorderLayout.CENTER);
+        bottomPanel.add(saveImageButton, BorderLayout.SOUTH);
+        
+        desktopPanel.add(bottomPanel, BorderLayout.SOUTH);
+	}
+	
+	public JPanel getDisplay() {
+		return desktopPanel;
+	}
+	
+	public void setDesktopConfig(List<Rectangle> config) {
+		int i = 0;
+		desktopParamsMap.clear();
+		for (Rectangle dc : config) {
+            buildImageSelectPanel(dc, ++i);
         }
+	}
+	
+	private void buildImageSelectPanel(Rectangle config, final int nbDesktop) {
+        DesktopParameterPanel dpPanel = new DesktopParameterPanel();
 
-        add(screens.get(number));
+        final JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        dpPanel.build();
+        panel.add(dpPanel.getDisplay(), BorderLayout.CENTER);
+
+        tabbedPane.add("Desktop " + nbDesktop, panel);
+
+        screensViewPanel.addScreen(nbDesktop, config);
+
+        desktopParamsMap.put(nbDesktop, dpPanel);
+        
+        dpPanel.addPropertyChangeListener(new DesktopParamChangeListener(nbDesktop, screensViewPanel));
     }
+	
+	public void setWallpaper(File wallpaper, int desktopIndex) {
+		desktopParamsMap.get(desktopIndex).setWallpaperFile(wallpaper);
+		screensViewPanel.setImage(desktopIndex, wallpaper);
+	}
+	
+	private class DesktopParamChangeListener implements PropertyChangeListener {
+		
+		private final int desktopIndex;
+		private final ScreensViewPanel screensViewPanel;
+		
+		public DesktopParamChangeListener(final int desktopIndex, final ScreensViewPanel screensViewPanel) {
+			this.desktopIndex = desktopIndex;
+			this.screensViewPanel = screensViewPanel;
+		}
 
-    private void setComponentBounds() {
-        final Dimension compDim = new Dimension(getWidth() - 2 * BORDER_WIDTH, getHeight() - 2 * BORDER_WIDTH);
-
-        final Dimension scaledDim = ImageScalerUtils.getScaledImage(ScalingAlgorithm.STRETCH_KEEP_PROPORTION_NO_CROP,
-                screensDim, compDim);
-
-        final double scaleRatio = scaledDim.getWidth() / screensDim.getWidth();
-
-        final int x = (getWidth() - scaledDim.width) / 2;
-        final int y = (getHeight() - scaledDim.height) / 2;
-
-        for (ImageDisplayer id : screens.values()) {
-            Rectangle r = id.getScreenData();
-
-            r.x = (int) (x + (r.x * scaleRatio));
-            r.y = (int) (y + (r.y * scaleRatio));
-            r.width = (int) (r.width * scaleRatio);
-            r.height = (int) (r.height * scaleRatio);
-
-            id.setDisplayScaleRatio(scaleRatio);
-            id.setBounds(r);
-        }
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        if (!initComplete) {
-            setComponentBounds();
-            initComplete = true;
-        }
-
-        Color oldColor = g.getColor();
-        g.setColor(Color.GRAY);
-        g.fillRect(0, 0, getWidth(), getHeight());
-        g.setColor(oldColor);
-
-        super.paintComponent(g);
-    }
-
-    public void setImage(int no, File image) {
-        if (screens.containsKey(no)) {
-            screens.get(no).setImage(image);
-        }
-    }
-
-    public void setScalingAlgorithm(int no, ScalingAlgorithm algorithm) {
-        if (screens.containsKey(no)) {
-            screens.get(no).setScalingAlgorithm(algorithm);
-        }
-    }
-    
-    public void setBackgroundColor(int no, Color backgroundColor) {
-        if (screens.containsKey(no)) {
-            screens.get(no).setBackground(backgroundColor);
-        }
-    }
-
-    public Dimension getScreensDimension() {
-        return screensDim;
-    }
-    
-    public Collection<ImageDisplayer> getDisplayers() {
-        return screens.values();
-    }
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			if ("file".equals(evt.getPropertyName())) {
+				screensViewPanel.setImage(desktopIndex, (File) evt.getNewValue());
+			}
+			else if ("scalingAlgorithm".equals(evt.getPropertyName())) {
+				screensViewPanel.setScalingAlgorithm(desktopIndex, (ScalingAlgorithm) evt.getNewValue());
+			}
+			else if ("bgColor".equals(evt.getPropertyName())) {
+				screensViewPanel.setBackgroundColor(desktopIndex, (Color) evt.getNewValue());
+			}
+		}
+	}
 }

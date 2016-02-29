@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -27,18 +29,17 @@ import info.seravee.data.ScalingAlgorithm;
 /**
  * Created by ysaak on 27/01/15.
  */
-public class DesktopParameterPanel {
+class DesktopParameterPanel {
+	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     private final JPanel mainPanel;
 
     private final JTextField filenameField;
     private final JButton chooseFileButton;
-    private final JComboBox scalingAlgoField;
+    private final JComboBox<ScalingAlgorithm> scalingAlgoField;
     
     private final JLabel colorDisplayLabel;
     private final JButton colorChooserButton;
-
-    private DesktopParameterListener listener = null;
 
     public DesktopParameterPanel() {
         mainPanel = new JPanel();
@@ -66,27 +67,18 @@ public class DesktopParameterPanel {
                 int returnVal = fc.showOpenDialog(mainPanel);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-
-                    filenameField.setText(file.getAbsolutePath());
-
-                    if (listener != null) {
-                        listener.imageSelected(file);
-                    }
+                    setWallpaperFile(file);
                 }
             }
         });
 
-        scalingAlgoField = new JComboBox(ScalingAlgorithm.values());
+        scalingAlgoField = new JComboBox<ScalingAlgorithm>(ScalingAlgorithm.values());
         scalingAlgoField.setSelectedIndex(ScalingAlgorithm.indexOf(DefaultConfiguration.SCALING_ALGORITHM));
         scalingAlgoField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ScalingAlgorithm algo = (ScalingAlgorithm) scalingAlgoField.getSelectedItem();
-                System.out.println(algo);
-
-                if (listener != null) {
-                    listener.scalingAlgorithmSelected(algo);
-                }
+               	pcs.firePropertyChange("scalingAlgorithm", null, algo);
             }
         });
 
@@ -109,9 +101,7 @@ public class DesktopParameterPanel {
                 Color c = JColorChooser.showDialog(null, "Choose a Color", colorDisplayLabel.getBackground());
                 if (c != null) {
                     colorDisplayLabel.setBackground(c);
-                    if (listener != null) {
-                        listener.backgroundColorSelected(c);
-                    }
+                    pcs.firePropertyChange("bgColor", null, c);
                 }
             }
         });
@@ -161,14 +151,18 @@ public class DesktopParameterPanel {
     public JComponent getDisplay() {
         return mainPanel;
     }
-
-    public void setListener(DesktopParameterListener listener) {
-        this.listener = listener;
-    }
     
-    public interface DesktopParameterListener {
-        public void imageSelected(File imageFile);
-        public void scalingAlgorithmSelected(ScalingAlgorithm algorithm);
-        public void backgroundColorSelected(Color backgroundColor);
+    public void setWallpaperFile(File wallpaper) {
+    	File oldValue = (filenameField.getText().length() == 0) ? null : new File(filenameField.getText());
+    	filenameField.setText(wallpaper.getAbsolutePath());
+    	this.pcs.firePropertyChange("file", oldValue, wallpaper);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        this.pcs.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        this.pcs.removePropertyChangeListener(listener);
     }
 }

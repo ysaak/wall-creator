@@ -59,7 +59,7 @@ class ImageLoadingWorker extends SwingWorker<Void, Wallpaper> {
 					final BufferedImage image = ImageIO.read(file);
 		            
 					publish(new Wallpaper(file, 
-		            		ImageScalerUtils.getScaledThumbnail(
+		            		ImageScalerUtils.getScaledImage(
 		            				image, 
 		            				DefaultConfiguration.SCALING_ALGORITHM, 
 		            				new Dimension(DefaultConfiguration.THUMBNAIL_WIDTH, DefaultConfiguration.THUMBNAIL_HEIGHT)

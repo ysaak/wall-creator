@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 
 import info.seravee.DefaultConfiguration;
 import info.seravee.data.ScalingAlgorithm;
+import info.seravee.data.ScreenWallpaper;
 import info.seravee.utils.ImageScalerUtils;
 
 /**
@@ -25,6 +26,7 @@ import info.seravee.utils.ImageScalerUtils;
 public class ImageDisplayer extends JComponent {
 	private static final long serialVersionUID = 1L;
 	
+	private File imageFile;
 	private ScalingAlgorithm scalingAlgorithm = DefaultConfiguration.SCALING_ALGORITHM;
     private BufferedImage image = null;
     private Image scaledImage = null;
@@ -68,6 +70,7 @@ public class ImageDisplayer extends JComponent {
     }
 
     public void setImage(File imageFile) {
+    	this.imageFile = imageFile;
         try {
             image = ImageIO.read(imageFile);
 
@@ -90,6 +93,10 @@ public class ImageDisplayer extends JComponent {
         repaint();
     }
     
+    public ScreenWallpaper getData() {
+    	return new ScreenWallpaper(screenData, imageFile, scalingAlgorithm, getBackground());
+    }
+    
     private void rebuildImage() {
         if (image == null) {
             return;
@@ -99,9 +106,9 @@ public class ImageDisplayer extends JComponent {
             public void run() {
                 final Dimension initialDimensions = new Dimension((int) (image.getWidth() * displayScaleRatio), (int) (image.getHeight() * displayScaleRatio));
                 
-                scaledImage = image.getScaledInstance(initialDimensions.width, initialDimensions.height, Image.SCALE_SMOOTH);
+                //scaledImage = image.getScaledInstance(initialDimensions.width, initialDimensions.height, Image.SCALE_SMOOTH);
                 
-                Dimension scaledDimension = ImageScalerUtils.getScaledImage(scalingAlgorithm, initialDimensions, getSize());
+                Dimension scaledDimension = ImageScalerUtils.getScaledImageDimensions(scalingAlgorithm, initialDimensions, getSize());
                 scaledImage = image.getScaledInstance(scaledDimension.width, scaledDimension.height, Image.SCALE_SMOOTH);
 
                 SwingUtilities.invokeLater(new Runnable() {
@@ -131,7 +138,7 @@ public class ImageDisplayer extends JComponent {
         g2.fillRect(0, 0, screenData.width, screenData.height);
 
         if (image != null) {
-            Dimension scaledDimension = ImageScalerUtils.getScaledImage(scalingAlgorithm, new Dimension(image.getWidth(), image.getHeight()), screenData.getSize());
+            Dimension scaledDimension = ImageScalerUtils.getScaledImageDimensions(scalingAlgorithm, new Dimension(image.getWidth(), image.getHeight()), screenData.getSize());
             Image scaledImg = image.getScaledInstance(scaledDimension.width, scaledDimension.height, Image.SCALE_SMOOTH);
 
             int width = screenData.width - 1;

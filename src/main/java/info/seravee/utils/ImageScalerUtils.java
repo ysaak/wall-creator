@@ -2,7 +2,6 @@ package info.seravee.utils;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
@@ -82,21 +81,21 @@ public class ImageScalerUtils {
 		return ret;
 	}
 
-	public static final Image getScaledThumbnail(BufferedImage original, ScalingAlgorithm algorithm, Dimension thumbnailSize) {
+	public static final BufferedImage getScaledImage(BufferedImage original, ScalingAlgorithm algorithm, Dimension thumbnailSize) {
 		// Get original image dimension
 		final Dimension initialDimensions = new Dimension((int) (original.getWidth(null)), (int) (original.getHeight(null)));
 		
 		// Get scaled dimension according to algorithm
-		final Dimension scaledDimension = getScaledImage(algorithm, initialDimensions, thumbnailSize);
+		final Dimension scaledDimension = getScaledImageDimensions(algorithm, initialDimensions, thumbnailSize);
 		
 		// Resize image
 		BufferedImage scaledImage = getScaledInstance2(original, scaledDimension.width, scaledDimension.height, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
 		
 		// Crop image
-		if (scaledDimension.width != thumbnailSize.width || scaledDimension.height != thumbnailSize.height) {
+		if (scaledDimension.width > thumbnailSize.width || scaledDimension.height > thumbnailSize.height) {
 			// One of the dimension differs, let's crop the image
-			final int x = (scaledDimension.width - thumbnailSize.width) / 2;
-            final int y = (scaledDimension.height - thumbnailSize.height) / 2;
+			final int x = Math.abs(scaledDimension.width - thumbnailSize.width) / 2;
+            final int y = Math.abs(scaledDimension.height - thumbnailSize.height) / 2;
             
             scaledImage = scaledImage.getSubimage(x, y, thumbnailSize.width, thumbnailSize.height);
 		}
@@ -110,7 +109,7 @@ public class ImageScalerUtils {
 		
 	}
 
-	public static Dimension getScaledImage(ScalingAlgorithm algorithm, Dimension original, Dimension target) {
+	public static Dimension getScaledImageDimensions(ScalingAlgorithm algorithm, Dimension original, Dimension target) {
 
 		if (algorithm == ScalingAlgorithm.CENTER) {
 			return original;

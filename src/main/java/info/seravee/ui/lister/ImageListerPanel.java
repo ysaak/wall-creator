@@ -5,10 +5,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -261,5 +263,10 @@ public class ImageListerPanel {
 				wallpaperSelectionListener.wallpaperSelected(imageList.getSelectedValue(), desktopIndex);
 			}
 		}
+	}
+
+	public void setDesktopConfig(List<Rectangle> config) {
+		// TODO init popup menu with the good number of screens
+		
 	}
 }
