@@ -1,16 +1,20 @@
 package info.seravee.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
 
 import info.seravee.data.lister.Wallpaper;
 import info.seravee.ui.creator.DesktopPanel;
+import info.seravee.ui.icons.navigation.MonitorIcon;
+import info.seravee.ui.icons.navigation.WallpapersIcon;
+import info.seravee.ui.laf.TabbedPane;
+import info.seravee.ui.laf.TabbedPane.TabLocation;
 import info.seravee.ui.lister.ImageListerPanel;
 
 /**
@@ -23,7 +27,7 @@ public class CreatorFrame {
     private final DesktopPanel desktopPanel;
     private final ImageListerPanel imageListerPanel;
     
-    private final JTabbedPane mainTabbedPane;
+    private final TabbedPane mainTabbedPane;
     
     
 
@@ -31,7 +35,7 @@ public class CreatorFrame {
         frame = new JFrame("Wall creator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        mainTabbedPane = new JTabbedPane();
+        mainTabbedPane = new TabbedPane();
         
         desktopPanel = new DesktopPanel();
         
@@ -53,23 +57,22 @@ public class CreatorFrame {
         JComponent contentPane = (JComponent) frame.getContentPane();
         contentPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(10, 10));
+        contentPane.setBackground(Color.LIGHT_GRAY);
         
         desktopPanel.buildPanel();
-        mainTabbedPane.add("Selection", desktopPanel.getDisplay());
+        mainTabbedPane.addTab(TabLocation.LEFT, new MonitorIcon(), "Monitor", desktopPanel.getDisplay());
         
         imageListerPanel.buildPanel();
-        mainTabbedPane.add("Lister", imageListerPanel.getDisplay());
+        mainTabbedPane.addTab(TabLocation.LEFT, new WallpapersIcon(), "Wallpapers", imageListerPanel.getDisplay());
         
         
-        contentPane.add(mainTabbedPane, BorderLayout.CENTER);
+        contentPane.add(mainTabbedPane.getDisplay(), BorderLayout.CENTER);
     }
 
     public void setDesktopConfig(List<Rectangle> config) {
     	desktopPanel.setDesktopConfig(config);
     	imageListerPanel.setDesktopConfig(config);
     }
-
-    
 
     public void show() {
         frame.setVisible(true);
