@@ -12,7 +12,7 @@ import java.security.MessageDigest;
 
 import javax.imageio.ImageIO;
 
-import info.seravee.platform.Platforms;
+import info.seravee.wallcreator.platform.Platforms;
 
 public class ThumbnailManager {
 	/**

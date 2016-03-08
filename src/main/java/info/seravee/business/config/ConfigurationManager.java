@@ -13,7 +13,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import info.seravee.business.exceptions.ConfigurationException;
 import info.seravee.data.config.Configuration;
 import info.seravee.data.config.DialogLastFolderType;
-import info.seravee.platform.Platforms;
+import info.seravee.wallcreator.platform.Platforms;
 
 public class ConfigurationManager {
 

@@ -1,4 +1,4 @@
-package info.seravee.platform;
+package info.seravee.wallcreator.platform;
 
 /**
  * Created by ysaak on 31/01/15.

@@ -4,9 +4,9 @@ import javax.swing.SwingUtilities;
 
 import info.seravee.business.config.ConfigurationManager;
 import info.seravee.business.exceptions.ConfigurationException;
-import info.seravee.platform.Platform;
-import info.seravee.platform.Platforms;
 import info.seravee.ui.CreatorFrame;
+import info.seravee.wallcreator.platform.Platform;
+import info.seravee.wallcreator.platform.Platforms;
 
 /**
  * Hello world!

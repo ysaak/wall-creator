@@ -1,4 +1,4 @@
-package info.seravee.platform;
+package info.seravee.wallcreator.platform;
 
 import java.awt.Rectangle;
 import java.nio.file.Path;
