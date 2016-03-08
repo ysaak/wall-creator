@@ -1,4 +1,4 @@
-package info.seravee.ui.icons.navigation;
+package info.seravee.wallcreator.ui.icons.navigation;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -24,13 +24,6 @@ public class WallpapersIcon extends NavigationIcon {
 		// Translate to paint location
 		g2.translate(x, y);
 
-		/*
-		 * if (!coloredIcon) g2.setColor(Color.WHITE); else { // If colored, we
-		 * add the screen color in blue g2.setColor(new Color(93, 156, 236));
-		 * g2.fillRect(2, 2, 28, 18);
-		 * 
-		 * g2.setColor(Color.BLACK); }
-		 */
 		if (!coloredIcon)
 			g2.setColor(Color.WHITE);
 

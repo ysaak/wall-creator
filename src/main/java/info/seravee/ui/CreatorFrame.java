@@ -1,21 +1,21 @@
 package info.seravee.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import info.seravee.data.lister.Wallpaper;
 import info.seravee.ui.creator.DesktopPanel;
-import info.seravee.ui.icons.navigation.MonitorIcon;
-import info.seravee.ui.icons.navigation.WallpapersIcon;
-import info.seravee.ui.laf.TabbedPane;
-import info.seravee.ui.laf.TabbedPane.TabLocation;
 import info.seravee.ui.lister.ImageListerPanel;
+import info.seravee.wallcreator.ui.GuiConstants;
+import info.seravee.wallcreator.ui.IconTestPanel;
+import info.seravee.wallcreator.ui.icons.navigation.GearIcon;
+import info.seravee.wallcreator.ui.icons.navigation.MonitorIcon;
+import info.seravee.wallcreator.ui.icons.navigation.WallpapersIcon;
+import info.seravee.wallcreator.ui.navigation.NavigationPane;
 
 /**
  * Created by ysaak on 27/01/15.
@@ -27,7 +27,7 @@ public class CreatorFrame {
     private final DesktopPanel desktopPanel;
     private final ImageListerPanel imageListerPanel;
     
-    private final TabbedPane mainTabbedPane;
+    private final NavigationPane mainTabbedPane;
     
     
 
@@ -35,7 +35,7 @@ public class CreatorFrame {
         frame = new JFrame("Wall creator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        mainTabbedPane = new TabbedPane();
+        mainTabbedPane = new NavigationPane();
         
         desktopPanel = new DesktopPanel();
         
@@ -55,15 +55,18 @@ public class CreatorFrame {
 
     private void buildFrame() {
         JComponent contentPane = (JComponent) frame.getContentPane();
-        contentPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        contentPane.setBorder(GuiConstants.BASE_EMPTY_BORDER);
         contentPane.setLayout(new BorderLayout(10, 10));
-        contentPane.setBackground(Color.LIGHT_GRAY);
+        contentPane.setBackground(GuiConstants.MAIN_BACKGROUND_COLOR);
         
         desktopPanel.buildPanel();
-        mainTabbedPane.addTab(TabLocation.LEFT, new MonitorIcon(), "Monitor", desktopPanel.getDisplay());
+        mainTabbedPane.addLeftTab(new MonitorIcon(), "Monitor", desktopPanel.getDisplay());
         
         imageListerPanel.buildPanel();
-        mainTabbedPane.addTab(TabLocation.LEFT, new WallpapersIcon(), "Wallpapers", imageListerPanel.getDisplay());
+        mainTabbedPane.addLeftTab(new WallpapersIcon(), "Wallpapers", imageListerPanel.getDisplay());
+        
+        
+        mainTabbedPane.addRightTab(new GearIcon(), "Parameters", new IconTestPanel(), true);
         
         
         contentPane.add(mainTabbedPane.getDisplay(), BorderLayout.CENTER);

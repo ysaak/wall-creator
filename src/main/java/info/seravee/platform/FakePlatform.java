@@ -14,6 +14,7 @@ class FakePlatform extends AbstractPlaform {
         List<Rectangle> fakeConfig = new ArrayList<Rectangle>();
         fakeConfig.add(new Rectangle(0, 0, 1920, 1080));
         fakeConfig.add(new Rectangle(1920, 0, 1280, 1024));
+        fakeConfig.add(new Rectangle(3200, 0, 1920, 1080));
         return fakeConfig;
     }
 }

@@ -1,4 +1,4 @@
-package info.seravee.ui.laf;
+package info.seravee.wallcreator.ui.navigation;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -28,9 +28,10 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.Timer;
 
-import info.seravee.ui.icons.navigation.NavigationIcon;
+import info.seravee.wallcreator.ui.GuiConstants;
+import info.seravee.wallcreator.ui.icons.navigation.NavigationIcon;
 
-public class TabbedPane {
+public class NavigationPane {
 
 	public enum TabLocation {
 		LEFT, RIGHT
@@ -55,18 +56,18 @@ public class TabbedPane {
 		public void itemStateChanged(final ItemEvent e) { tabItemEvent(e); }
 	};
 
-	public TabbedPane() {
+	public NavigationPane() {
 		mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setOpaque(false);
 
-		buttonsPanel = new JPanel(new BorderLayout(5, 0));
+		buttonsPanel = new JPanel(new BorderLayout(GuiConstants.BASE_SPACER, 0));
 		buttonsPanel.setOpaque(false);
 
 		// Panel containing all the panels
 		cardLayout = new CardLayout();
 		panelsPanel = new JPanel(cardLayout);
 		panelsPanel.setBackground(Color.WHITE);
-		panelsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		panelsPanel.setBorder(BorderFactory.createEmptyBorder(GuiConstants.BASE_SPACER, GuiConstants.BASE_SPACER, GuiConstants.BASE_SPACER, GuiConstants.BASE_SPACER));
 		panelsPanel.setOpaque(true);
 		
 		
@@ -78,11 +79,27 @@ public class TabbedPane {
 		mainPanel.add(panelsPanel, BorderLayout.CENTER);
 	}
 
-	public void addTab(final TabLocation location, final NavigationIcon icon, final String name, final JComponent component) {
+	public void addLeftTab(final NavigationIcon icon, String name, final JComponent component) {
+		addLeftTab(icon, name, component, false);
+	}
+
+	public void addLeftTab(final NavigationIcon icon, String name, final JComponent component, final boolean iconOnly) {
+		addTab(TabLocation.LEFT, icon, name, component, iconOnly);
+	}
+	
+	public void addRightTab(final NavigationIcon icon, String name, final JComponent component) {
+		addRightTab(icon, name, component, false);
+	}
+
+	public void addRightTab(final NavigationIcon icon, String name, final JComponent component, final boolean iconOnly) {
+		addTab(TabLocation.RIGHT, icon, name, component, iconOnly);
+	}
+	
+	private void addTab(final TabLocation location, final NavigationIcon icon, final String name, final JComponent component, final boolean iconOnly) {
 
 		if (!tabButtonMap.containsKey(name)) {
 
-			TabButton tb = new TabButton(icon, name);
+			TabButton tb = new TabButton(icon, name, iconOnly);
 			tabButtonMap.put(name, tb);
 
 			if (location == TabLocation.LEFT) {
@@ -107,7 +124,7 @@ public class TabbedPane {
 		buttonsPanel.removeAll();
 		
 		JPanel leftButtonsPanel = new JPanel(true);
-		leftButtonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 0));
+		leftButtonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, GuiConstants.BASE_SPACER, 0));
 		leftButtonsPanel.setOpaque(false);
 		
 		for (TabButton tb : leftTabButtonList) {
@@ -115,6 +132,16 @@ public class TabbedPane {
 		}
 		
 		buttonsPanel.add(leftButtonsPanel, BorderLayout.WEST);
+		
+		JPanel rightButtonsPanel = new JPanel(true);
+		rightButtonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, GuiConstants.BASE_SPACER, 0));
+		rightButtonsPanel.setOpaque(false);
+		
+		for (TabButton tb : rightTabButtonList) {
+			rightButtonsPanel.add(tb);
+		}
+		
+		buttonsPanel.add(rightButtonsPanel, BorderLayout.EAST);
 	}
 	
 
@@ -137,7 +164,7 @@ public class TabbedPane {
 		
 		// Animation parameters
 		private static final int FADE_DURATION = 150; // time in MS
-		private static final float FINAL_OPACITY = 0.8f;
+		private static final float FINAL_OPACITY = 0.3f;
 		private static final float OPACITY_INCREMENT = FINAL_OPACITY / FADE_DURATION;
 		
 		private Timer transitionTimer = null;
@@ -145,13 +172,16 @@ public class TabbedPane {
 		private float bgOpacity = 0f;
 		
 		private final NavigationIcon icon;
+		private final boolean iconOnly;
 
-		public TabButton(final NavigationIcon icon, final String name) {
+		public TabButton(final NavigationIcon icon, final String name, final boolean iconOnly) {
 			setName(name);
-			setText(name);
-			setToolTipText(name);
 			
 			this.icon = icon;
+			this.iconOnly = iconOnly;
+			
+			setText(!iconOnly ? name: "");
+			setToolTipText(name);
 
 			setBorderPainted(false);
 			setOpaque(false);
@@ -159,8 +189,13 @@ public class TabbedPane {
 			
 			setFont(getFont().deriveFont(Font.BOLD, 14.f));
 			
-			int w = getPreferredSize().width;
-			w += 50; // 30px for icon, 20px for spaces
+			final int w;
+			if (iconOnly) {
+				w = 50; 
+			}
+			else {
+				w = getPreferredSize().width + 50; // 30px for icon, 20px for spaces
+			}
 			
 			
 			Dimension d = new Dimension(w, TAB_BUTTON_HEIGHT);
@@ -212,11 +247,11 @@ public class TabbedPane {
 					fgColor = Color.BLACK;
 				}
 				else if (transition) {
-					bgColor = new Color(0f, 0f, 0f, bgOpacity);
+					bgColor = new Color(1f, 1f, 1f, bgOpacity);
 					fgColor = Color.WHITE;
 				}
 				else {
-					bgColor = new Color(0f, 0f, 0f, 0f);
+					bgColor = new Color(1f, 1f, 1f, 0f);
 					fgColor = Color.WHITE;
 				}
 			}

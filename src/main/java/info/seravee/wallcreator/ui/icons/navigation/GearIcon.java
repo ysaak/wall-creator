@@ -1,4 +1,4 @@
-package info.seravee.ui.icons.navigation;
+package info.seravee.wallcreator.ui.icons.navigation;
 
 import java.awt.Color;
 import java.awt.Component;

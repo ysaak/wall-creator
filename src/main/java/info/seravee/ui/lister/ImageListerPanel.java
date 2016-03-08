@@ -16,7 +16,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,6 +41,7 @@ import info.seravee.data.lister.Wallpaper;
 import info.seravee.ui.WallpaperSelectionListener;
 import info.seravee.ui.lister.ImageLoadingWorker.LoadingWorkerListener;
 import info.seravee.utils.SwingUtils;
+import info.seravee.wallcreator.ui.lister.FolderList;
 
 public class ImageListerPanel {
 
@@ -64,7 +64,7 @@ public class ImageListerPanel {
 	private final LoadingWorkerListener workerListener;
 
 	public ImageListerPanel() {
-		listerPanel = new JPanel(new BorderLayout());
+		listerPanel = new JPanel(new BorderLayout(10,10));
 
 		imageListModel = new DefaultListModel<>();
 		imageList = new JList<>(imageListModel);
@@ -114,7 +114,7 @@ public class ImageListerPanel {
 
 		// Folders
 		folderListModel = new DefaultListModel<>();
-		folderList = new JList<>(folderListModel);
+		folderList = new FolderList<>(folderListModel);
 		folderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		folderList.setVisibleRowCount(-1);
 		folderList.addListSelectionListener(new ListSelectionListener() {
@@ -127,6 +127,7 @@ public class ImageListerPanel {
 				}
 			}
 		});
+		/*
 		folderList.setCellRenderer(new DefaultListCellRenderer() {
 			private static final long serialVersionUID = 1L;
 
@@ -138,9 +139,11 @@ public class ImageListerPanel {
 				JLabel component = (JLabel) super.getListCellRendererComponent(list, folder.getName(), index,
 						isSelected, cellHasFocus);
 				component.setToolTipText(folder.getAbsolutePath());
+				
 				return component;
 			}
-		});
+		})
+		*/;
 
 		addFolderButton = new JButton(new AddDirectoryAction());
 		removeFolderButton = new JButton(new RemoveFolderAction());
@@ -159,16 +162,19 @@ public class ImageListerPanel {
 	}
 
 	public void buildPanel() {
-		listerPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		listerPanel.setOpaque(false);
 
 		// -- Folder panel
 		SwingUtils.setSMPSizes(folderList,
 				new Dimension(DefaultConfiguration.FOLDER_LIST_WIDTH, DefaultConfiguration.FOLDER_LIST_HEIGHT));
 
 		final JPanel folderPanel = new JPanel(new BorderLayout());
+		folderPanel.setBackground(Color.WHITE);
+		//folderPanel
 
 		final JScrollPane folderScroller = new JScrollPane(folderList);
 		folderScroller.setBackground(Color.WHITE);
+		folderScroller.setBorder(null);
 
 		folderPanel.add(folderScroller, BorderLayout.CENTER);
 
