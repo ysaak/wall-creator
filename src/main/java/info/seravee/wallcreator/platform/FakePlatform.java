@@ -1,6 +1,7 @@
 package info.seravee.wallcreator.platform;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,5 +17,10 @@ class FakePlatform extends AbstractPlaform {
         fakeConfig.add(new Rectangle(1920, 0, 1280, 1024));
         fakeConfig.add(new Rectangle(3200, 0, 1920, 1080));
         return fakeConfig;
+    }
+    
+    @Override
+    public void setWallpaper(File wallpaper) {
+    	// Nothing to do
     }
 }

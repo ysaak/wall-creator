@@ -1,6 +1,7 @@
 package info.seravee.wallcreator.platform;
 
 import java.awt.Rectangle;
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -10,4 +11,6 @@ import java.util.List;
 public interface Platform {
 	Path getAppDirectory();
     List<Rectangle> getDesktopConfiguration();
+    
+    void setWallpaper(File wallpaper);
 }

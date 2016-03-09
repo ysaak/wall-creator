@@ -2,6 +2,7 @@ package info.seravee.ui.creator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +22,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import info.seravee.business.workers.SaveImageWorker;
 import info.seravee.data.ScalingAlgorithm;
+import info.seravee.wallcreator.business.workers.SetWallpaperWorker;
 
 public class DesktopPanel {
 	private final JPanel desktopPanel;
@@ -30,6 +32,7 @@ public class DesktopPanel {
 	private final JTabbedPane tabbedPane;
 	
 	private final JButton saveImageButton;
+	private final JButton setImageButton;
 	
 	private final Map<Integer, DesktopParameterPanel> desktopParamsMap;
 	
@@ -66,14 +69,28 @@ public class DesktopPanel {
                 }
             }
         });
+        
+        setImageButton = new JButton("Set wallpaper");
+        setImageButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new SetWallpaperWorker(screensViewPanel.getData()).execute();
+			}
+		});
 	}
 	
 	public void buildPanel() {
 		desktopPanel.add(screensViewPanel, BorderLayout.CENTER);
+		
+		
+		JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+		buttonsPanel.add(saveImageButton);
+		buttonsPanel.add(setImageButton);
 
 		JPanel bottomPanel = new JPanel(new BorderLayout(5, 5));
         bottomPanel.add(tabbedPane, BorderLayout.CENTER);
-        bottomPanel.add(saveImageButton, BorderLayout.SOUTH);
+        bottomPanel.add(buttonsPanel, BorderLayout.SOUTH);
         
         desktopPanel.add(bottomPanel, BorderLayout.SOUTH);
 	}

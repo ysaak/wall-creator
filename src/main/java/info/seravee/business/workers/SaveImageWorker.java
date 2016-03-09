@@ -17,9 +17,8 @@ import info.seravee.utils.ImageScalerUtils;
 
 public class SaveImageWorker extends SwingWorker<Void, Void> {
 	
-	private final File imageFile;
-	private final List<ScreenWallpaper> screenWallpapers;
-	
+	protected final File imageFile;
+	protected final List<ScreenWallpaper> screenWallpapers;
 	
     public SaveImageWorker(File imageFile, List<ScreenWallpaper> screenWallpapers) {
         this.imageFile = imageFile;
