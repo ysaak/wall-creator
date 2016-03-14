@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonModel;
 import javax.swing.JComponent;
-import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
 
 import info.seravee.wallcreator.ui.components.LafUtils;
@@ -17,16 +16,6 @@ public class XButtonUI extends BasicButtonUI {
 	
 	private static final int ARC_SIZE = 10;
 	
-	public static ComponentUI createUI(ButtonColor baseColor) {
-		return new XButtonUI(baseColor);
-	}
-	
-	private final ButtonColor color;
-	
-	public XButtonUI(ButtonColor color) {
-		this.color = color;
-	}
-
 	@Override
 	public void installUI(JComponent c) {
 		super.installUI(c);
@@ -52,29 +41,37 @@ public class XButtonUI extends BasicButtonUI {
 	    drawBackground(g2, b, model, d);
 
 	    // Draw icon if present
+	    final boolean hasIcon = b.getIcon() != null;
+	    final boolean hasText = b.getText() != null && b.getText().trim().length() > 0; 
 	    
 	    int iconWidth = 0;
-	    if (b.getIcon() != null) {
+	    if (hasIcon) {
 	    	iconWidth = b.getIcon().getIconWidth() +  (b.getIconTextGap() * 2);
+
 	    	
-	    	int ix = b.getIconTextGap();
+	    	int ix = (hasText) ? b.getIconTextGap() : (d.width - b.getIcon().getIconWidth()) / 2;
 	    	int iy =  (d.height - b.getIcon().getIconHeight()) / 2;
 	    	
 	    	b.getIcon().paintIcon(b, g2, ix, iy);
 	    }
 	    
 	    
-	    g.setFont(c.getFont());
-	    FontMetrics fm = g.getFontMetrics();
-
-	    g.setColor(b.getForeground());
-	    String caption = b.getText();
-	    int x = ((d.width - iconWidth - fm.stringWidth(caption)) / 2) + iconWidth;
-	    int y = (d.height + fm.getAscent()) / 2;
-	    g.drawString(caption, x, y);
+	    if (hasText) {
+	    	g.setFont(c.getFont());
+	    	FontMetrics fm = g.getFontMetrics();
+	    	
+	    	g.setColor(b.getForeground());
+	    	String caption = b.getText();
+	    	int x = ((d.width - iconWidth - fm.stringWidth(caption)) / 2) + iconWidth;
+	    	int y = (d.height + fm.getAscent()) / 2;
+	    	g.drawString(caption, x, y);
+	    }
+	    
 	}
 	
-	private void drawBackground( Graphics2D g2, AbstractButton button, ButtonModel model, Dimension dimension) {
+	private void drawBackground(Graphics2D g2, AbstractButton button, ButtonModel model, Dimension dimension) {
+		
+		final XButtonColor color =  (XButtonColor) button.getClientProperty("x-button-color");
 		
 		if (model.isArmed()) {
 			g2.setColor(color.getPressedColor());

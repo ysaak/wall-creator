@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -15,10 +16,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -29,6 +28,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -41,12 +44,21 @@ import info.seravee.data.lister.Wallpaper;
 import info.seravee.ui.WallpaperSelectionListener;
 import info.seravee.ui.lister.ImageLoadingWorker.LoadingWorkerListener;
 import info.seravee.utils.SwingUtils;
+import info.seravee.wallcreator.ui.GuiConstants;
+import info.seravee.wallcreator.ui.components.DropShadowBorder;
+import info.seravee.wallcreator.ui.components.LightScrollPane;
+import info.seravee.wallcreator.ui.components.SolarizedColor;
+import info.seravee.wallcreator.ui.components.button.XButton;
+import info.seravee.wallcreator.ui.components.button.XButtonPosition;
+import info.seravee.wallcreator.ui.icons.MinusIcon;
+import info.seravee.wallcreator.ui.icons.PlusIcon;
 import info.seravee.wallcreator.ui.lister.FolderList;
 
 public class ImageListerPanel {
 
 	private final DefaultListModel<File> folderListModel;
 	private final JList<File> folderList;
+	private final JLabel folderLabel;
 
 	private final DefaultListModel<Wallpaper> imageListModel;
 	private final JList<Wallpaper> imageList;
@@ -57,8 +69,8 @@ public class ImageListerPanel {
 
 	private WallpaperSelectionListener wallpaperSelectionListener = null;
 
-	private final JButton addFolderButton;
-	private final JButton removeFolderButton;
+	private final XButton addFolderButton;
+	private final XButton removeFolderButton;
 
 	private ImageLoadingWorker worker = null;
 	private final LoadingWorkerListener workerListener;
@@ -84,7 +96,7 @@ public class ImageListerPanel {
 			}
 		});
 
-		imageList.setBackground(Color.GRAY);
+		imageList.setBackground(Color.WHITE);
 
 		// Create the popup menu.
 		popup = new JPopupMenu();
@@ -113,6 +125,9 @@ public class ImageListerPanel {
 		});
 
 		// Folders
+		folderLabel = new JLabel("Folders :");
+		folderLabel.setFont(folderLabel.getFont().deriveFont(Font.BOLD));
+		
 		folderListModel = new DefaultListModel<>();
 		folderList = new FolderList<>(folderListModel);
 		folderList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -127,26 +142,9 @@ public class ImageListerPanel {
 				}
 			}
 		});
-		/*
-		folderList.setCellRenderer(new DefaultListCellRenderer() {
-			private static final long serialVersionUID = 1L;
 
-			@Override
-			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-					boolean cellHasFocus) {
-				File folder = (File) value;
-
-				JLabel component = (JLabel) super.getListCellRendererComponent(list, folder.getName(), index,
-						isSelected, cellHasFocus);
-				component.setToolTipText(folder.getAbsolutePath());
-				
-				return component;
-			}
-		})
-		*/;
-
-		addFolderButton = new JButton(new AddDirectoryAction());
-		removeFolderButton = new JButton(new RemoveFolderAction());
+		addFolderButton = new XButton(new AddDirectoryAction(), XButtonPosition.FIRST);
+		removeFolderButton = new XButton(new RemoveFolderAction(), XButtonPosition.LAST);
 		
 		for(String folder : ConfigurationManager.get().getWallpapersFolders()) {
 			folderListModel.addElement(new File(folder));
@@ -165,20 +163,28 @@ public class ImageListerPanel {
 		listerPanel.setOpaque(false);
 
 		// -- Folder panel
-		SwingUtils.setSMPSizes(folderList,
-				new Dimension(DefaultConfiguration.FOLDER_LIST_WIDTH, DefaultConfiguration.FOLDER_LIST_HEIGHT));
+		
 
-		final JPanel folderPanel = new JPanel(new BorderLayout());
+		final JPanel folderPanel = new JPanel(new BorderLayout(0,0));
 		folderPanel.setBackground(Color.WHITE);
+		folderPanel.setBorder(new CompoundBorder(
+				new MatteBorder(0, 0, 0, 1, SolarizedColor.BASE2),
+				new EmptyBorder(0, 0, 0, GuiConstants.BASE_SPACER)
+		));
 		//folderPanel
+		
+		folderLabel.setBorder(new EmptyBorder(GuiConstants.SMALL_SPACER, 0, GuiConstants.SMALL_SPACER, 0));
+		
 
-		final JScrollPane folderScroller = new JScrollPane(folderList);
+		final LightScrollPane folderScroller = new LightScrollPane(folderList);
 		folderScroller.setBackground(Color.WHITE);
 		folderScroller.setBorder(null);
 
+		folderPanel.add(folderLabel, BorderLayout.NORTH);
 		folderPanel.add(folderScroller, BorderLayout.CENTER);
 
-		JPanel folderButtonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel folderButtonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		folderButtonsPanel.setOpaque(false);
 		folderButtonsPanel.add(addFolderButton);
 		folderButtonsPanel.add(removeFolderButton);
 
@@ -187,18 +193,21 @@ public class ImageListerPanel {
 		listerPanel.add(folderPanel, BorderLayout.WEST);
 
 		// -- Thumbnail list panel
-		JScrollPane listScroller = new JScrollPane(imageList);
+		LightScrollPane listScroller = new LightScrollPane(imageList);
 		listScroller.setAlignmentX(JScrollPane.LEFT_ALIGNMENT);
 		listScroller.setBackground(Color.GRAY);
-		listScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		listScroller.setBorder(null);
 
 		// Compute component width
 		Dimension viewDimension = new Dimension(
 				// Don't forget to get scrollbar size
-				ThumbnailView.getViewWidth() * DefaultConfiguration.THUMBNAIL_PER_LINE,
+				ThumbnailView.getViewWidth() * DefaultConfiguration.THUMBNAIL_PER_LINE + listScroller.getScrollBarSize(),
 				ThumbnailView.getViewHeight() * DefaultConfiguration.THUMBNAIL_LINES);
 
-		SwingUtils.setSMPSizes(listScroller.getViewport(), viewDimension);
+		SwingUtils.setSMPSizes(listScroller, viewDimension);
+		
+		SwingUtils.setSMPSizes(folderPanel,
+				new Dimension(DefaultConfiguration.FOLDER_LIST_WIDTH, DefaultConfiguration.FOLDER_LIST_HEIGHT));
 
 		listerPanel.add(listScroller, BorderLayout.CENTER);
 	}
@@ -235,12 +244,7 @@ public class ImageListerPanel {
 		public ThumbnailView(String text, ImageIcon image, boolean selected) {
 			setOpaque(false);
 			this.setLayout(new BorderLayout(0, 0));
-			if (selected) {
-				this.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3),
-						BorderFactory.createLineBorder(Color.BLUE, 2)));
-			} else {
-				this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-			}
+			this.setBorder(getBorder(selected));
 
 			imageLabel = new JLabel(image);
 			imageLabel.setSize(imageDimension);
@@ -259,6 +263,15 @@ public class ImageListerPanel {
 
 		public static final int getViewHeight() {
 			return imageDimension.height + (5 * 2);
+		}
+		
+		private Border getBorder(boolean selected) {
+			DropShadowBorder shadow = new DropShadowBorder(Color.BLACK, 5);
+	        shadow.setShowLeftShadow(true);
+	        shadow.setShowRightShadow(true);
+	        shadow.setShowBottomShadow(true);
+	        shadow.setShowTopShadow(true);
+	        return shadow;
 		}
 	}
 
@@ -288,7 +301,7 @@ public class ImageListerPanel {
 		private static final long serialVersionUID = 3830971456460167481L;
 
 		public AddDirectoryAction() {
-			super("+");
+			super("", new PlusIcon(14));
 		}
 
 		@Override
@@ -332,7 +345,7 @@ public class ImageListerPanel {
 		private static final long serialVersionUID = -3159823531107055372L;
 
 		public RemoveFolderAction() {
-			super("-");
+			super("", new MinusIcon(14));
 		}
 		
 		@Override
