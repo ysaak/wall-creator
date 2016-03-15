@@ -23,6 +23,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import info.seravee.business.workers.SaveImageWorker;
 import info.seravee.data.ScalingAlgorithm;
 import info.seravee.wallcreator.business.workers.SetWallpaperWorker;
+import info.seravee.wallcreator.ui.monitors.ScreensViewPanel;
 
 public class DesktopPanel {
 	private final JPanel desktopPanel;

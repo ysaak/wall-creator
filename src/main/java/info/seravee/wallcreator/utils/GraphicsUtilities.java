@@ -694,4 +694,41 @@ public class GraphicsUtilities {
         }
     }
 
+    
+    public static Color getAverageColor(BufferedImage img, int width, int height) {
+    	float r = 0, g = 0, b = 0;
+    	
+    	for (int x = 0; x < width; x++) {
+    		for (int y=0; y < height; y++) {
+    			
+    			final Color c = new Color(img.getRGB(x, y), true);
+    			float a = c.getAlpha() / 255f;
+    			
+    			r += c.getRed() * a;
+    			g += c.getGreen() * a;
+    			b += c.getBlue() * a;
+    		}
+    	}
+    	
+    	
+    	int nbPixels = width * height;
+    	
+    	return new Color(
+    			Math.round(r / nbPixels),
+    			Math.round(g / nbPixels),
+    			Math.round(b / nbPixels)
+    	);
+    }
+    
+    public static Color getForegroundFromBackground(Color bgColor) {
+    	// Counting the perceptive luminance - human eye favors green color... 
+        double a = 1 - ( 0.299 * bgColor.getRed() + 0.587 * bgColor.getGreen() + 0.114 * bgColor.getBlue()) / 255;
+        
+        if (a < 0.5) {
+        	return Color.BLACK;
+        }
+        else {
+        	return Color.WHITE;
+        }
+    }
 }

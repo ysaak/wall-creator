@@ -1,4 +1,4 @@
-package info.seravee.ui.creator;
+package info.seravee.wallcreator.ui.monitors;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,26 +23,41 @@ import info.seravee.utils.ImageScalerUtils;
 public class ScreensViewPanel extends JComponent {
 	private static final long serialVersionUID = -8461734317635643191L;
 
+	/**
+	 * Minimal border around monitors
+	 */
 	private static final int BORDER_WIDTH = 20;
 
-    private Map<Integer, ImageDisplayer> screens = new HashMap<Integer, ImageDisplayer>();
+    private Map<Integer, ScreenView> screens = new HashMap<>();
 
-    boolean initComplete = false;
-
-    // Cal vars
+    /**
+     * Full dimension of the screen
+     */
     private Dimension screensDim = new Dimension(0, 0);
+    
+    private final ScreenListener screenListener = new ScreenListener() {
+		
+		@Override
+		public void screenSelected(int id) {
+			setSelectedMonitor(id);
+		}
+	}; 
+    
+    public void addScreen(int id, Rectangle config) {
+    	
+    	ScreenView sView = new ScreenView(id, config);
+    	sView.addScreenListener(screenListener);
+    	
+        screens.put(id, sView);
 
-    public void addScreen(int number, Rectangle config) {
-        screens.put(number, new ImageDisplayer(config));
-
-        // Compute data
-        for (ImageDisplayer id : screens.values()) {
-            final Rectangle sc = id.getScreenData();
-            screensDim.width = Math.max(screensDim.width, sc.width + sc.x);
-            screensDim.height = Math.max(screensDim.height, sc.height + sc.y);
+        // re-Compute data
+        for (ScreenView sv : screens.values()) {
+            final Rectangle sData = sv.getScreenData();
+            screensDim.width = Math.max(screensDim.width, sData.width + sData.x);
+            screensDim.height = Math.max(screensDim.height, sData.height + sData.y);
         }
 
-        add(screens.get(number));
+        add(sView);
     }
 
     private void setComponentBounds() {
@@ -56,25 +71,22 @@ public class ScreensViewPanel extends JComponent {
         final int x = (getWidth() - scaledDim.width) / 2;
         final int y = (getHeight() - scaledDim.height) / 2;
 
-        for (ImageDisplayer id : screens.values()) {
-            Rectangle r = id.getScreenData();
+        for (ScreenView sv : screens.values()) {
+            Rectangle r = sv.getScreenData();
 
             r.x = (int) (x + (r.x * scaleRatio));
             r.y = (int) (y + (r.y * scaleRatio));
             r.width = (int) (r.width * scaleRatio);
             r.height = (int) (r.height * scaleRatio);
 
-            id.setDisplayScaleRatio(scaleRatio);
-            id.setBounds(r);
+            sv.setDisplayScaleRatio(scaleRatio);
+            sv.setBounds(r);
         }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        if (!initComplete) {
-            setComponentBounds();
-            initComplete = true;
-        }
+    	setComponentBounds();
 
         Color oldColor = g.getColor();
         g.setColor(Color.GRAY);
@@ -102,17 +114,23 @@ public class ScreensViewPanel extends JComponent {
         }
     }
 
-    public Collection<ImageDisplayer> getDisplayers() {
+    public Collection<ScreenView> getDisplayers() {
         return screens.values();
     }
     
     public List<ScreenWallpaper> getData() {
     	List<ScreenWallpaper> datas = new ArrayList<>();
     	
-    	for (ImageDisplayer id : screens.values()) {
-    		datas.add(id.getData());
+    	for (ScreenView sv : screens.values()) {
+    		datas.add(sv.getData());
     	}
     	
     	return datas;
+    }
+    
+    public void setSelectedMonitor(int id) {
+    	for (ScreenView sv : screens.values()) {
+    		sv.setSelected(sv.getId() == id);
+    	}
     }
 }
