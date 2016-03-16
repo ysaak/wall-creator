@@ -1,12 +1,12 @@
 package info.seravee.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Rectangle;
 import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import info.seravee.data.Screen;
 import info.seravee.data.lister.Wallpaper;
 import info.seravee.ui.creator.DesktopPanel;
 import info.seravee.ui.lister.ImageListerPanel;
@@ -72,7 +72,7 @@ public class CreatorFrame {
         contentPane.add(mainTabbedPane.getDisplay(), BorderLayout.CENTER);
     }
 
-    public void setDesktopConfig(List<Rectangle> config) {
+    public void setDesktopConfig(List<Screen> config) {
     	desktopPanel.setDesktopConfig(config);
     	imageListerPanel.setDesktopConfig(config);
     }

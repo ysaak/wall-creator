@@ -6,7 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -38,6 +37,7 @@ import javax.swing.event.ListSelectionListener;
 import info.seravee.DefaultConfiguration;
 import info.seravee.business.config.ConfigurationManager;
 import info.seravee.business.exceptions.ConfigurationException;
+import info.seravee.data.Screen;
 import info.seravee.data.config.Configuration;
 import info.seravee.data.config.DialogLastFolderType;
 import info.seravee.data.lister.Wallpaper;
@@ -65,8 +65,6 @@ public class ImageListerPanel {
 
 	private final JPanel listerPanel;
 
-	private final JPopupMenu popup;
-
 	private WallpaperSelectionListener wallpaperSelectionListener = null;
 
 	private final XButton addFolderButton;
@@ -74,6 +72,8 @@ public class ImageListerPanel {
 
 	private ImageLoadingWorker worker = null;
 	private final LoadingWorkerListener workerListener;
+	
+	private List<Screen> screens = null;
 
 	public ImageListerPanel() {
 		listerPanel = new JPanel(new BorderLayout(10,10));
@@ -98,11 +98,6 @@ public class ImageListerPanel {
 
 		imageList.setBackground(Color.WHITE);
 
-		// Create the popup menu.
-		popup = new JPopupMenu();
-		popup.add(new JMenuItem(new SetToDesktopAction(1)));
-		popup.add(new JMenuItem(new SetToDesktopAction(2)));
-
 		imageList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -119,7 +114,8 @@ public class ImageListerPanel {
 					imageList.setSelectedIndex(imageList.locationToIndex(e.getPoint()));
 
 					if (imageList.getSelectedIndex() != -1)
-						popup.show(imageList, e.getX(), e.getY());
+						
+					createImageListPopupMenu().show(imageList, e.getX(), e.getY());
 				}
 			}
 		});
@@ -216,6 +212,15 @@ public class ImageListerPanel {
 		return listerPanel;
 	}
 
+	protected JPopupMenu createImageListPopupMenu() {
+		final JPopupMenu popup = new JPopupMenu();
+		
+		for (Screen screen : screens)
+			popup.add(new JMenuItem(new SetToDesktopAction(screen.getId())));
+		
+		return popup;
+	}
+	
 	protected void startImageLoading(File folder) {
 		if (worker != null) {
 			worker.removeListener();
@@ -292,9 +297,8 @@ public class ImageListerPanel {
 		}
 	}
 
-	public void setDesktopConfig(List<Rectangle> config) {
-		// TODO init popup menu with the good number of screens
-
+	public void setDesktopConfig(List<Screen> screens) {
+		this.screens = screens;
 	}
 
 	private class AddDirectoryAction extends AbstractAction {

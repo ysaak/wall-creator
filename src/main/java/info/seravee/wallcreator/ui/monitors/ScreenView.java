@@ -32,6 +32,7 @@ import javax.swing.UIManager;
 
 import info.seravee.DefaultConfiguration;
 import info.seravee.data.ScalingAlgorithm;
+import info.seravee.data.Screen;
 import info.seravee.data.ScreenWallpaper;
 import info.seravee.utils.ImageScalerUtils;
 import info.seravee.wallcreator.ui.components.LafUtils;
@@ -60,8 +61,7 @@ public class ScreenView extends JComponent {
 
 	private double displayScaleRatio = 1.0;
 
-	private final int id;
-	private final Rectangle screenData;
+	private final Screen screen;
 
 	private boolean selected = false;
 	private boolean screenIdVisible = false;
@@ -70,9 +70,8 @@ public class ScreenView extends JComponent {
 	
 	private final Timer imageBuildingTimer;
 
-	public ScreenView(final int id, final Rectangle screenData) {
-		this.id = id;
-		this.screenData = screenData;
+	public ScreenView(final Screen screen) {
+		this.screen = screen;
 		setBackground(DefaultConfiguration.BACKGROUND_COLOR);
 		screenListeners = new HashSet<>();
 		
@@ -138,7 +137,7 @@ public class ScreenView extends JComponent {
 			final int si_x = 10, si_y = 10;
 			FontMetrics m = getFontMetrics(ID_FONT);
 			
-			final int si_w = m.stringWidth(String.valueOf(id)),
+			final int si_w = m.stringWidth(String.valueOf(screen.getId())),
 					  si_h = m.getHeight();
 			
 			final Color textBgColor;
@@ -157,7 +156,7 @@ public class ScreenView extends JComponent {
 			g2.setFont(ID_FONT);
 			g2.setColor(GraphicsUtilities.getForegroundFromBackground(textBgColor));
 			
-			g2.drawString(String.valueOf(id), si_x, si_y + si_h - m.getDescent());
+			g2.drawString(String.valueOf(screen.getId()), si_x, si_y + si_h - m.getDescent());
 			
 			g2.setFont(oldFont);
 		}
@@ -206,7 +205,7 @@ public class ScreenView extends JComponent {
 	}
 
 	public ScreenWallpaper getData() {
-		return new ScreenWallpaper(screenData, imageFile, scalingAlgorithm, getBackground());
+		return new ScreenWallpaper(screen.getBounds(), imageFile, scalingAlgorithm, getBackground());
 	}
 	
 	protected void rebuildImage() {
@@ -236,25 +235,25 @@ public class ScreenView extends JComponent {
 	}
 
 	public Rectangle getScreenData() {
-		return new Rectangle(screenData);
+		return new Rectangle(screen.getBounds());
 	}
 
 	public Image getScaledImage() {
-		BufferedImage bi = new BufferedImage(screenData.width, screenData.height, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage bi = new BufferedImage(screen.getBounds().width, screen.getBounds().height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2 = bi.createGraphics();
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g2.setColor(getBackground());
-		g2.fillRect(0, 0, screenData.width, screenData.height);
+		g2.fillRect(0, 0, screen.getBounds().width, screen.getBounds().height);
 
 		if (image != null) {
 			Dimension scaledDimension = ImageScalerUtils.getScaledImageDimensions(scalingAlgorithm,
-					new Dimension(image.getWidth(), image.getHeight()), screenData.getSize());
+					new Dimension(image.getWidth(), image.getHeight()), screen.getBounds().getSize());
 			Image scaledImg = image.getScaledInstance(scaledDimension.width, scaledDimension.height,
 					Image.SCALE_SMOOTH);
 
-			int width = screenData.width - 1;
-			int height = screenData.height - 1;
+			int width = screen.getBounds().width - 1;
+			int height = screen.getBounds().height - 1;
 
 			int x = (width - scaledImg.getWidth(this)) / 2;
 			int y = (height - scaledImg.getHeight(this)) / 2;
@@ -266,7 +265,7 @@ public class ScreenView extends JComponent {
 	}
 	
 	public int getId() {
-		return id;
+		return screen.getId();
 	}
 	
 	public boolean isSelected() {
@@ -300,7 +299,7 @@ public class ScreenView extends JComponent {
 	protected void fireScreenSelectedEvent() {
 		synchronized (screenListeners) {
 			for (ScreenListener l : screenListeners) {
-				l.screenSelected(id);
+				l.screenSelected(screen.getId());
 			}
 		}
 	}

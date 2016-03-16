@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 
 import info.seravee.data.ScalingAlgorithm;
+import info.seravee.data.Screen;
 import info.seravee.data.ScreenWallpaper;
 import info.seravee.utils.ImageScalerUtils;
 
@@ -43,12 +44,12 @@ public class ScreensViewPanel extends JComponent {
 		}
 	}; 
     
-    public void addScreen(int id, Rectangle config) {
+    public void addScreen(Screen config) {
     	
-    	ScreenView sView = new ScreenView(id, config);
+    	ScreenView sView = new ScreenView(config);
     	sView.addScreenListener(screenListener);
     	
-        screens.put(id, sView);
+        screens.put(config.getId(), sView);
 
         // re-Compute data
         for (ScreenView sv : screens.values()) {

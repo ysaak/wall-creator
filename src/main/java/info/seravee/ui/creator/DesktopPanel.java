@@ -3,7 +3,6 @@ package info.seravee.ui.creator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -22,6 +21,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import info.seravee.business.workers.SaveImageWorker;
 import info.seravee.data.ScalingAlgorithm;
+import info.seravee.data.Screen;
 import info.seravee.wallcreator.business.workers.SetWallpaperWorker;
 import info.seravee.wallcreator.ui.monitors.ScreensViewPanel;
 
@@ -100,15 +100,14 @@ public class DesktopPanel {
 		return desktopPanel;
 	}
 	
-	public void setDesktopConfig(List<Rectangle> config) {
-		int i = 0;
+	public void setDesktopConfig(List<Screen> screenList) {
 		desktopParamsMap.clear();
-		for (Rectangle dc : config) {
-            buildImageSelectPanel(dc, ++i);
+		for (Screen screen : screenList) {
+            buildImageSelectPanel(screen);
         }
 	}
 	
-	private void buildImageSelectPanel(Rectangle config, final int nbDesktop) {
+	private void buildImageSelectPanel(Screen screen) {
         DesktopParameterPanel dpPanel = new DesktopParameterPanel();
 
         final JPanel panel = new JPanel(new BorderLayout(10, 10));
@@ -116,13 +115,13 @@ public class DesktopPanel {
         dpPanel.build();
         panel.add(dpPanel.getDisplay(), BorderLayout.CENTER);
 
-        tabbedPane.add("Desktop " + nbDesktop, panel);
+        tabbedPane.add("Desktop " + screen.getId(), panel);
 
-        screensViewPanel.addScreen(nbDesktop, config);
+        screensViewPanel.addScreen(screen);
 
-        desktopParamsMap.put(nbDesktop, dpPanel);
+        desktopParamsMap.put(screen.getId(), dpPanel);
         
-        dpPanel.addPropertyChangeListener(new DesktopParamChangeListener(nbDesktop, screensViewPanel));
+        dpPanel.addPropertyChangeListener(new DesktopParamChangeListener(screen.getId(), screensViewPanel));
     }
 	
 	public void setWallpaper(File wallpaper, int desktopIndex) {
