@@ -268,6 +268,10 @@ public class ScreenView extends JComponent {
 		return screen.getId();
 	}
 	
+	public Screen getScreen() {
+		return screen;
+	}
+	
 	public boolean isSelected() {
 		return selected;
 	}

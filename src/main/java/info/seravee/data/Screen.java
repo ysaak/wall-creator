@@ -19,4 +19,20 @@ public class Screen {
 		return bounds;
 	}
 	
+	public int getX() {
+		return bounds.x;
+	}
+	
+	public int getY() {
+		return bounds.y;
+	}
+	
+	public int getWidth() {
+		return bounds.width;
+	}
+	
+	public int getHeight() {
+		return bounds.height;
+	}
+	
 }

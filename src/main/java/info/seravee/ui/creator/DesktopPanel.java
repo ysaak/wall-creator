@@ -105,6 +105,7 @@ public class DesktopPanel {
 		for (Screen screen : screenList) {
             buildImageSelectPanel(screen);
         }
+		screensViewPanel.setScreens(screenList);
 	}
 	
 	private void buildImageSelectPanel(Screen screen) {
@@ -116,8 +117,6 @@ public class DesktopPanel {
         panel.add(dpPanel.getDisplay(), BorderLayout.CENTER);
 
         tabbedPane.add("Desktop " + screen.getId(), panel);
-
-        screensViewPanel.addScreen(screen);
 
         desktopParamsMap.put(screen.getId(), dpPanel);
         
