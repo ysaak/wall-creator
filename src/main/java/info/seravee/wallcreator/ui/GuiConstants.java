@@ -2,6 +2,7 @@ package info.seravee.wallcreator.ui;
 
 import java.awt.Color;
 
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 public final class GuiConstants {
@@ -14,6 +15,6 @@ public final class GuiConstants {
 	public static final int SMALL_SPACER = 5;
 	
 	
-	public static final EmptyBorder BASE_EMPTY_BORDER = new EmptyBorder(BASE_SPACER, BASE_SPACER, BASE_SPACER, BASE_SPACER);
+	public static final Border BASE_EMPTY_BORDER = new EmptyBorder(BASE_SPACER, BASE_SPACER, BASE_SPACER, BASE_SPACER);
 	
 }

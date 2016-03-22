@@ -4,7 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-import info.seravee.data.Screen;
+import info.seravee.wallcreator.beans.Screen;
 
 /**
  * Created by ysaak on 31/01/15.

@@ -37,13 +37,13 @@ import javax.swing.event.ListSelectionListener;
 import info.seravee.DefaultConfiguration;
 import info.seravee.business.config.ConfigurationManager;
 import info.seravee.business.exceptions.ConfigurationException;
-import info.seravee.data.Screen;
 import info.seravee.data.config.Configuration;
 import info.seravee.data.config.DialogLastFolderType;
 import info.seravee.data.lister.Wallpaper;
 import info.seravee.ui.WallpaperSelectionListener;
 import info.seravee.ui.lister.ImageLoadingWorker.LoadingWorkerListener;
 import info.seravee.utils.SwingUtils;
+import info.seravee.wallcreator.beans.Screen;
 import info.seravee.wallcreator.ui.GuiConstants;
 import info.seravee.wallcreator.ui.components.DropShadowBorder;
 import info.seravee.wallcreator.ui.components.LightScrollPane;
@@ -216,7 +216,7 @@ public class ImageListerPanel {
 		final JPopupMenu popup = new JPopupMenu();
 		
 		for (Screen screen : screens)
-			popup.add(new JMenuItem(new SetToDesktopAction(screen.getId())));
+			popup.add(new JMenuItem(new SetToDesktopAction(screen)));
 		
 		return popup;
 	}
@@ -282,17 +282,18 @@ public class ImageListerPanel {
 
 	private class SetToDesktopAction extends AbstractAction {
 		private static final long serialVersionUID = -3408983078331514079L;
-		private final int desktopIndex;
+		private final Screen screen;
 
-		public SetToDesktopAction(final int desktopIndex) {
-			super("Set to desktop " + desktopIndex);
-			this.desktopIndex = desktopIndex;
+		public SetToDesktopAction(final Screen screen) {
+			super("Set to desktop " + screen.getId());
+			this.screen = screen;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (wallpaperSelectionListener != null) {
-				wallpaperSelectionListener.wallpaperSelected(imageList.getSelectedValue(), desktopIndex);
+			
+			if (imageList.getSelectedValue() != null) {
+				screen.setImageFile(imageList.getSelectedValue().getFile());
 			}
 		}
 	}

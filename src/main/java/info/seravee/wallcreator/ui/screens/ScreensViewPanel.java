@@ -1,4 +1,4 @@
-package info.seravee.wallcreator.ui.monitors;
+package info.seravee.wallcreator.ui.screens;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -7,19 +7,20 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JComponent;
 
 import info.seravee.data.ScalingAlgorithm;
-import info.seravee.data.Screen;
 import info.seravee.data.ScreenWallpaper;
 import info.seravee.utils.ImageScalerUtils;
+import info.seravee.wallcreator.beans.Screen;
 
 /**
  * Created by ysaak on 01/02/15.
@@ -40,20 +41,25 @@ public class ScreensViewPanel extends JComponent {
     private Dimension screensSize = new Dimension(0, 0);
     
     private double screensScaleRatio = 1.0;
+    
+    private final Set<ScreenListener> screenListeners;
 
-    private final ScreenListener screenListener = new ScreenListener() {
-		
-		@Override
-		public void screenSelected(int id) {
-			setSelectedMonitor(id);
-		}
-	}; 
-	
 	public ScreensViewPanel() {
+		
+		screenListeners = new HashSet<>();
+		
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
 				updateGraphicsData();
+			}
+		});
+		
+		screenListeners.add(new ScreenListener() {
+			
+			@Override
+			public void screenSelected(Screen screen) {
+				setSelectedScreen(screen);
 			}
 		});
 	}
@@ -64,7 +70,9 @@ public class ScreensViewPanel extends JComponent {
 		
 		for (Screen screen : screenList) {
 			ScreenView view = new ScreenView(screen);
-	    	view.addScreenListener(screenListener);
+			
+			for (ScreenListener l : screenListeners)
+				view.addScreenListener(l);
 	    	
 	        screens.put(screen.getId(), view);
 	        add(view);
@@ -78,7 +86,8 @@ public class ScreensViewPanel extends JComponent {
 	
 	private void clearScreens() {
 		for (ScreenView view : screens.values()) {
-			view.removeScreenListener(screenListener);
+			for (ScreenListener l : screenListeners)
+				view.removeScreenListener(l);
 		}
 		
 		screens.clear();
@@ -104,7 +113,6 @@ public class ScreensViewPanel extends JComponent {
         	r.width = ((int) Math.floor(r.width * screensScaleRatio));
         	r.height = ((int) Math.floor(r.height * screensScaleRatio));
         	
-        	sv.setDisplayScaleRatio(screensScaleRatio);
         	sv.setBounds(r);
         }
         
@@ -130,24 +138,6 @@ public class ScreensViewPanel extends JComponent {
         }
     }
 
-    public void setImage(int no, File image) {
-        if (screens.containsKey(no)) {
-            screens.get(no).setImage(image);
-        }
-    }
-
-    public void setScalingAlgorithm(int no, ScalingAlgorithm algorithm) {
-        if (screens.containsKey(no)) {
-            screens.get(no).setScalingAlgorithm(algorithm);
-        }
-    }
-    
-    public void setBackgroundColor(int no, Color backgroundColor) {
-        if (screens.containsKey(no)) {
-            screens.get(no).setBackground(backgroundColor);
-        }
-    }
-
     public Collection<ScreenView> getDisplayers() {
         return screens.values();
     }
@@ -162,9 +152,21 @@ public class ScreensViewPanel extends JComponent {
     	return datas;
     }
     
-    public void setSelectedMonitor(int id) {
+    public void setSelectedScreen(Screen screen) {
     	for (ScreenView sv : screens.values()) {
-    		sv.setSelected(sv.getId() == id);
+    		sv.setSelected(sv.getScreen().getId() == screen.getId());
     	}
     }
+    
+    public void addScreenListener(ScreenListener l) {
+		synchronized (screenListeners) {
+			screenListeners.add(l);
+		}
+	}
+	
+	public void removeScreenListener(ScreenListener l) {
+		synchronized (screenListeners) {
+			screenListeners.remove(l);
+		}
+	}
 }

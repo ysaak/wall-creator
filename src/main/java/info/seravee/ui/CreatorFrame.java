@@ -6,10 +6,10 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import info.seravee.data.Screen;
 import info.seravee.data.lister.Wallpaper;
 import info.seravee.ui.creator.DesktopPanel;
 import info.seravee.ui.lister.ImageListerPanel;
+import info.seravee.wallcreator.beans.Screen;
 import info.seravee.wallcreator.ui.GuiConstants;
 import info.seravee.wallcreator.ui.IconTestPanel;
 import info.seravee.wallcreator.ui.icons.navigation.GearIcon;
@@ -21,7 +21,6 @@ import info.seravee.wallcreator.ui.navigation.NavigationPane;
  * Created by ysaak on 27/01/15.
  */
 public class CreatorFrame {
-
     private final JFrame frame;
 
     private final DesktopPanel desktopPanel;
@@ -82,6 +81,7 @@ public class CreatorFrame {
     }
     
     protected void wallpaperSelectedForDesktop(Wallpaper wallpaper, int desktopIndex) {
-    	desktopPanel.setWallpaper(wallpaper.getFile(), desktopIndex);
+    	// FIXME review
+    	//desktopPanel.setWallpaper(wallpaper.getFile(), desktopIndex);
     }
 }
