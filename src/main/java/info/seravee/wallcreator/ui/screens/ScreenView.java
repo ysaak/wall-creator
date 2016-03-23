@@ -255,6 +255,7 @@ public class ScreenView extends JComponent {
 				paintScreenId(finalImage, g2);
 			}
 			
+			// TODO paint screen id
 			publishInEdt(finalImage);
 			
 			return null;

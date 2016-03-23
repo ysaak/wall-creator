@@ -6,11 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.representer.Representer;
 
 import info.seravee.business.exceptions.ConfigurationException;
 import info.seravee.data.config.Configuration;
@@ -49,8 +47,7 @@ public class ConfigurationManager {
 		
 		try (Writer writer = Files.newBufferedWriter(configFilePath, StandardCharsets.UTF_8)) {
 			yaml.dump(config, writer);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw new ConfigurationException("Error while storing configuration data", e);
 		}
 	}
@@ -60,18 +57,11 @@ public class ConfigurationManager {
 	}
 	
 	private static final Yaml getYamlObject() {
-		final Constructor constructor = new Constructor(Configuration.class); // Configuration.class is root
+		Constructor constructor = new Constructor(Configuration.class); // Configuration.class is root
 		TypeDescription configDescription = new TypeDescription(Configuration.class);
 		configDescription.putListPropertyType("wallpapersFolders", String.class);
 		configDescription.putMapPropertyType("lastFolders", DialogLastFolderType.class, String.class);
 		constructor.addTypeDescription(configDescription);
-		
-		final DumperOptions options = new DumperOptions();
-		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		options.setIndent(4);
-		options.setPrettyFlow(true);
-		options.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
-		
-		return new Yaml(constructor, new Representer(), options);
+		return new Yaml(constructor);
 	}
 }
