@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
@@ -43,6 +42,7 @@ import info.seravee.data.lister.Wallpaper;
 import info.seravee.ui.WallpaperSelectionListener;
 import info.seravee.ui.lister.ImageLoadingWorker.LoadingWorkerListener;
 import info.seravee.utils.SwingUtils;
+import info.seravee.wallcreator.beans.Profile;
 import info.seravee.wallcreator.beans.Screen;
 import info.seravee.wallcreator.ui.GuiConstants;
 import info.seravee.wallcreator.ui.components.DropShadowBorder;
@@ -73,7 +73,7 @@ public class ImageListerPanel {
 	private ImageLoadingWorker worker = null;
 	private final LoadingWorkerListener workerListener;
 	
-	private List<Screen> screens = null;
+	private Profile selectedProfile = null;
 
 	public ImageListerPanel() {
 		listerPanel = new JPanel(new BorderLayout(10,10));
@@ -215,8 +215,11 @@ public class ImageListerPanel {
 	protected JPopupMenu createImageListPopupMenu() {
 		final JPopupMenu popup = new JPopupMenu();
 		
-		for (Screen screen : screens)
-			popup.add(new JMenuItem(new SetToDesktopAction(screen)));
+		if (selectedProfile != null && selectedProfile.getScreens() != null) {
+			for (Screen screen : selectedProfile.getScreens())
+				popup.add(new JMenuItem(new SetToDesktopAction(screen)));
+		}
+		
 		
 		return popup;
 	}
@@ -236,6 +239,12 @@ public class ImageListerPanel {
 
 	public void setWallpaperSelectionListener(WallpaperSelectionListener wallpaperSelectionListener) {
 		this.wallpaperSelectionListener = wallpaperSelectionListener;
+	}
+	
+
+
+	public void setSelectedProfile(final Profile profile) {
+		this.selectedProfile = profile;
 	}
 
 	private static class ThumbnailView extends JPanel {
@@ -293,13 +302,9 @@ public class ImageListerPanel {
 		public void actionPerformed(ActionEvent e) {
 			
 			if (imageList.getSelectedValue() != null) {
-				screen.setImageFile(imageList.getSelectedValue().getFile());
+				screen.setImage(imageList.getSelectedValue().getFile().getAbsolutePath());
 			}
 		}
-	}
-
-	public void setDesktopConfig(List<Screen> screens) {
-		this.screens = screens;
 	}
 
 	private class AddDirectoryAction extends AbstractAction {

@@ -88,8 +88,10 @@ public class ScreensViewPanel extends JComponent {
 		for (ScreenView view : screens.values()) {
 			for (ScreenListener l : screenListeners)
 				view.removeScreenListener(l);
+			
 		}
 		
+		removeAll();
 		screens.clear();
 	}
 	
@@ -124,6 +126,7 @@ public class ScreensViewPanel extends JComponent {
     	//super.paintComponent(g);
     	
     	Graphics2D g2d = (Graphics2D) g;
+    	g2d.clearRect(0, 0, getWidth(), getHeight());
     	
     	Color oldColor = g2d.getColor();
     	

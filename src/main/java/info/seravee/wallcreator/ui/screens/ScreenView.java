@@ -20,6 +20,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +32,6 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
-import info.seravee.DefaultConfiguration;
 import info.seravee.data.ScreenWallpaper;
 import info.seravee.utils.ImageScalerUtils;
 import info.seravee.wallcreator.beans.Screen;
@@ -67,7 +67,7 @@ public class ScreenView extends JComponent {
 
 	public ScreenView(final Screen screen) {
 		this.screen = screen;
-		setBackground(DefaultConfiguration.BACKGROUND_COLOR);
+		setBackground(screen.getBackgroundColor());
 		screenListeners = new HashSet<>();
 		
 		imageBuildingTimer = new Timer(20, new ActionListener() {
@@ -162,7 +162,7 @@ public class ScreenView extends JComponent {
 	}
 
 	public ScreenWallpaper getData() {
-		return new ScreenWallpaper(screen.getBounds(), screen.getImageFile(), screen.getScalingAlgorithm(), getBackground());
+		return new ScreenWallpaper(screen.getBounds(), new File(screen.getImage()), screen.getScalingAlgorithm(), getBackground());
 	}
 	
 	protected void rebuildImage() {
@@ -247,7 +247,7 @@ public class ScreenView extends JComponent {
 			g2.fillRect(0, 0, getWidth(), getHeight());
 			
 			// Paint wallpaper
-			if (screen.getImageFile() != null) {
+			if (screen.getImage() != null) {
 				paintWallpaper(g2);
 			}
 			
@@ -262,7 +262,7 @@ public class ScreenView extends JComponent {
 		
 		private void paintWallpaper(Graphics2D g2) throws IOException {
 			// Read original file
-			final BufferedImage originalImage = ImageIO.read(screen.getImageFile());
+			final BufferedImage originalImage = ImageIO.read(new File(screen.getImage()));
 
 			// Scale the image
 			final BufferedImage scaledImage = ImageScalerUtils.getScaledImage(originalImage, screen.getScalingAlgorithm(), containerDimension);

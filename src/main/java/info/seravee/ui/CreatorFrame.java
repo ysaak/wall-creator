@@ -7,15 +7,16 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import info.seravee.data.lister.Wallpaper;
-import info.seravee.ui.creator.DesktopPanel;
 import info.seravee.ui.lister.ImageListerPanel;
-import info.seravee.wallcreator.beans.Screen;
+import info.seravee.wallcreator.beans.Profile;
 import info.seravee.wallcreator.ui.GuiConstants;
 import info.seravee.wallcreator.ui.IconTestPanel;
+import info.seravee.wallcreator.ui.event.ProfileSelectionListener;
 import info.seravee.wallcreator.ui.icons.navigation.GearIcon;
 import info.seravee.wallcreator.ui.icons.navigation.MonitorIcon;
 import info.seravee.wallcreator.ui.icons.navigation.WallpapersIcon;
 import info.seravee.wallcreator.ui.navigation.NavigationPane;
+import info.seravee.wallcreator.ui.screens.DesktopPanel;
 
 /**
  * Created by ysaak on 27/01/15.
@@ -37,6 +38,13 @@ public class CreatorFrame {
         mainTabbedPane = new NavigationPane();
         
         desktopPanel = new DesktopPanel();
+        desktopPanel.addProfileSelectionListener(new ProfileSelectionListener() {
+			
+			@Override
+			public void profileSelected(final Profile profile) {
+				imageListerPanel.setSelectedProfile(profile);
+			}
+		});
         
         imageListerPanel = new ImageListerPanel();
         imageListerPanel.setWallpaperSelectionListener(new WallpaperSelectionListener() {
@@ -70,10 +78,9 @@ public class CreatorFrame {
         
         contentPane.add(mainTabbedPane.getDisplay(), BorderLayout.CENTER);
     }
-
-    public void setDesktopConfig(List<Screen> config) {
-    	desktopPanel.setDesktopConfig(config);
-    	imageListerPanel.setDesktopConfig(config);
+    
+    public void setProfiles(List<Profile> profiles) {
+    	desktopPanel.setProfiles(profiles);
     }
 
     public void show() {

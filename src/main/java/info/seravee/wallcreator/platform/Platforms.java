@@ -10,7 +10,7 @@ public class Platforms {
 
     public static Platform get() {
     	if (platform == null) {
-    		platform = new FakePlatform();
+    		platform = new WindowsPlatform();
     	}
 
     	return platform;

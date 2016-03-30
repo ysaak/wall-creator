@@ -1,13 +1,16 @@
 package info.seravee;
 
+import java.io.IOException;
+import java.util.List;
+
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import info.seravee.business.config.ConfigurationManager;
 import info.seravee.business.exceptions.ConfigurationException;
 import info.seravee.ui.CreatorFrame;
-import info.seravee.wallcreator.platform.Platform;
-import info.seravee.wallcreator.platform.Platforms;
+import info.seravee.wallcreator.beans.Profile;
+import info.seravee.wallcreator.business.Services;
 import info.seravee.wallcreator.ui.components.LafUtils;
 
 /**
@@ -25,10 +28,18 @@ public class App
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
 			System.exit(-1);
+			return;
 		}
     	
-    	
     	//ThumbnailManager.purgeThumbnails();
+    	final List<Profile> profiles;
+    	try {
+			profiles = Services.getProfileService().list();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+			return;
+		}
     	
     	//*
     	try {
@@ -41,12 +52,10 @@ public class App
     	//*/
         frame = new CreatorFrame();
 
-        final Platform p = Platforms.get();
-
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                frame.setDesktopConfig(p.getDesktopConfiguration());
+            	frame.setProfiles(profiles);
                 frame.show();
             }
         });

@@ -86,7 +86,7 @@ public class WallpaperParametersPanel implements ScreenListener {
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
                     
-                    currentScreen.setImageFile(file);
+                    currentScreen.setImage(file.getAbsolutePath());
                 }
             }
         });
@@ -95,7 +95,7 @@ public class WallpaperParametersPanel implements ScreenListener {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentScreen.setImageFile(null);
+				currentScreen.setImage(null);
 			}
 		});
 
@@ -190,7 +190,7 @@ public class WallpaperParametersPanel implements ScreenListener {
     
     protected void updateFieldsFromBean() {
     	if (currentScreen != null) {
-    		imageField.setText(currentScreen.getImageFile() != null ? currentScreen.getImageFile().getAbsolutePath() : "");
+    		imageField.setText(currentScreen.getImage() != null ? currentScreen.getImage() : "");
     		scalingAlgoField.setSelectedItem(currentScreen.getScalingAlgorithm());
     		colorDisplayLabel.setBackground(currentScreen.getBackgroundColor());
     	}

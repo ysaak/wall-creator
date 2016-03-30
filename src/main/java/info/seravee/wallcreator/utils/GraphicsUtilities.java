@@ -2,6 +2,7 @@ package info.seravee.wallcreator.utils;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -13,11 +14,16 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
+
+import info.seravee.utils.ImageScalerUtils;
+import info.seravee.wallcreator.beans.Profile;
+import info.seravee.wallcreator.beans.Screen;
 
 public class GraphicsUtilities {
 	private GraphicsUtilities() {/**/}
@@ -693,7 +699,8 @@ public class GraphicsUtilities {
             g.dispose();
         }
     }
-
+    
+    /* ---------------------------------------------------------------------------- */
     
     public static Color getAverageColor(BufferedImage img, int width, int height) {
     	float r = 0, g = 0, b = 0;
@@ -730,5 +737,65 @@ public class GraphicsUtilities {
         else {
         	return Color.WHITE;
         }
+    }
+    
+    /* ---------------------------------------------------------------------------- */
+    
+    public static BufferedImage generateProfileWallpaper(Profile profile) throws IOException {
+    	int w, h;
+    	Dimension wallpaperDimension = new Dimension(0, 0);
+    	for (Screen sw : profile.getScreens()) {
+    		w = sw.getX() + sw.getWidth();
+    		h = sw.getY() + sw.getHeight();
+    		
+    		if (w > wallpaperDimension.width) wallpaperDimension.width = w;
+    		if (h > wallpaperDimension.height) wallpaperDimension.height = h;
+    	}
+    	
+
+        BufferedImage bi = new BufferedImage(wallpaperDimension.width, wallpaperDimension.height, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2 = bi.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Set a black background (for unused space) 
+        g2.setColor(Color.BLACK);
+        g2.fillRect(0, 0, wallpaperDimension.width, wallpaperDimension.height);
+        
+        
+        for (Screen sw : profile.getScreens()) { 
+        	try {
+        		paintScreenOnWallpaper(g2, sw);
+        	}
+        	catch (IOException e) {
+        		e.printStackTrace();
+        		throw e;
+        	}
+        }
+        
+        return bi;
+    }
+    
+    private static void paintScreenOnWallpaper(Graphics2D g2, Screen screen) throws IOException {
+    	
+    	// Set the default background color
+    	g2.setColor(screen.getBackgroundColor());
+    	g2.fillRect(screen.getX(), screen.getY(), screen.getWidth(), screen.getHeight());
+
+    	if (screen.getImage() != null) {
+	    	// 
+	    	final Dimension screenDimension = new Dimension(screen.getWidth(), screen.getHeight()); 
+	
+	    	// Load original image
+	    	final BufferedImage originalImage = ImageIO.read(new File(screen.getImage()));
+	    	final BufferedImage scaledImage = ImageScalerUtils.getScaledImage(originalImage, screen.getScalingAlgorithm(), screenDimension);
+	    	
+	    	// Compute image position on the screen
+	    	int x = screen.getX() + ((screenDimension.width  - scaledImage.getWidth(null))  / 2);
+	    	int y = screen.getY() + ((screenDimension.height - scaledImage.getHeight(null)) / 2);
+	    	
+	    	// Draw image
+	        g2.drawImage(scaledImage, x, y, null);
+    	}
     }
 }

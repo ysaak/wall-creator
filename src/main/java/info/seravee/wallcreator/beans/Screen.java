@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.File;
 
 import info.seravee.DefaultConfiguration;
 import info.seravee.data.ScalingAlgorithm;
@@ -13,47 +12,78 @@ public class Screen {
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 	
 	// Base data for the screen
-	private final int id;
-	private final Rectangle bounds;
+	private int id;
+
+	// Dimension of the scrren
+	private int x;
+	private int y;
+	private int width;
+	private int height;
 	
 	// Wallpaper data
-	private File imageFile = null;
+	private String image = null;
 	private ScalingAlgorithm scalingAlgorithm = DefaultConfiguration.SCALING_ALGORITHM;
 	private Color backgroundColor = DefaultConfiguration.BACKGROUND_COLOR;
 	
+	public Screen() {
+	}
+	
 	public Screen(int id, Rectangle bounds) {
 		this.id = id;
-		this.bounds = bounds;
+		this.x = bounds.x;
+		this.y = bounds.y;
+		this.width = bounds.width;
+		this.height = bounds.height;
 	}
 
 	public int getId() {
 		return id;
 	}
-
-	public Rectangle getBounds() {
-		return bounds;
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	public int getX() {
-		return bounds.x;
+		return x;
 	}
 	
 	public int getY() {
-		return bounds.y;
+		return y;
 	}
 	
 	public int getWidth() {
-		return bounds.width;
+		return width;
 	}
 	
 	public int getHeight() {
-		return bounds.height;
+		return height;
+	}
+
+	public Rectangle getBounds() {
+		return new Rectangle(x, y, width, height);
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 	
 	/*----------------*/
 
-	public File getImageFile() {
-		return imageFile;
+	public String getImage() {
+		return image;
 	}
 
 	public ScalingAlgorithm getScalingAlgorithm() {
@@ -64,12 +94,11 @@ public class Screen {
 		return backgroundColor;
 	}
 
-
-	public void setImageFile(File file) {
-		final File oldFile = this.imageFile;
-		this.imageFile = file;
+	public void setImage(String newImage) {
+		final String oldFile = image;
+		this.image = newImage;
 		
-		this.pcs.firePropertyChange("imageFile", oldFile,this.imageFile);
+		this.pcs.firePropertyChange("image", oldFile, image);
 	}
 
 	public void setScalingAlgorithm(ScalingAlgorithm scalingAlgorithm) {
@@ -83,6 +112,12 @@ public class Screen {
 		final Color oldColor = this.backgroundColor;
 		this.backgroundColor = backgroundColor;
 		this.pcs.firePropertyChange("backgroundColor", oldColor, this.backgroundColor);
+	}
+	
+	public void copyFrom(Screen screen) {
+		setBackgroundColor(screen.getBackgroundColor());
+		setScalingAlgorithm(screen.getScalingAlgorithm());
+		setImage(screen.getImage());
 	}
 	
 	/* ---- */

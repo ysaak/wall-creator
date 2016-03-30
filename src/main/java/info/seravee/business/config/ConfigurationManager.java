@@ -16,6 +16,7 @@ import info.seravee.business.exceptions.ConfigurationException;
 import info.seravee.data.config.Configuration;
 import info.seravee.data.config.DialogLastFolderType;
 import info.seravee.wallcreator.platform.Platforms;
+import info.seravee.wallcreator.utils.YamlUtils;
 
 public class ConfigurationManager {
 
@@ -26,12 +27,10 @@ public class ConfigurationManager {
 		
 		if (Files.exists(configFilePath)) {
 		
-			// Init YAML loader
-			Yaml yaml = getYamlObject();
-	
 			try {
-				currentConfig = (Configuration) yaml.load(Files.newInputStream(configFilePath));
-			} catch (IOException e) {
+				currentConfig = YamlUtils.load(getYamlObject(), configFilePath);
+			} 
+			catch (IOException e) {
 				throw new ConfigurationException("Error while reading config file", e);
 			}
 		}
