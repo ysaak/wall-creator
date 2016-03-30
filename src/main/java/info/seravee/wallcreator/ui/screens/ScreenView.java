@@ -32,7 +32,6 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
-import info.seravee.data.ScreenWallpaper;
 import info.seravee.utils.ImageScalerUtils;
 import info.seravee.wallcreator.beans.Screen;
 import info.seravee.wallcreator.ui.components.LafUtils;
@@ -117,27 +116,9 @@ public class ScreenView extends JComponent {
 		g2.setRenderingHints(LafUtils.ANTIALIASING_HINTS);
 		g2.clearRect(0, 0, getWidth(), getHeight());
 		
-		
-		/*
-
-		g2.setColor(getBackground());
-		g2.fillRect(0, 0, getWidth(), getHeight());
-
-		if (scaledImage != null) {
-			int width = getWidth() - 1;
-			int height = getHeight() - 1;
-
-			int x = (width - scaledImage.getWidth(this)) / 2;
-			int y = (height - scaledImage.getHeight(this)) / 2;
-
-			g2.drawImage(scaledImage, x, y, this);
-		}
-		
-		*/
 		if (displayedImage != null) {
 			g2.drawImage(displayedImage, 0, 0, getWidth(), getHeight(), this);
 		}
-		
 
 		g2.setColor(selected ? SolarizedColor.RED : Color.BLACK);
 		g2.fill(getBorderShape());
@@ -161,10 +142,6 @@ public class ScreenView extends JComponent {
         return path;
 	}
 
-	public ScreenWallpaper getData() {
-		return new ScreenWallpaper(screen.getBounds(), new File(screen.getImage()), screen.getScalingAlgorithm(), getBackground());
-	}
-	
 	protected void rebuildImage() {
 		new DisplayedImageBuilder(screen, getSize(), screenIdVisible).execute();
 	}

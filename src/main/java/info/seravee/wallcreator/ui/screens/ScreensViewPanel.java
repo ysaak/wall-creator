@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +17,6 @@ import java.util.Set;
 import javax.swing.JComponent;
 
 import info.seravee.data.ScalingAlgorithm;
-import info.seravee.data.ScreenWallpaper;
 import info.seravee.utils.ImageScalerUtils;
 import info.seravee.wallcreator.beans.Screen;
 
@@ -143,16 +141,6 @@ public class ScreensViewPanel extends JComponent {
 
     public Collection<ScreenView> getDisplayers() {
         return screens.values();
-    }
-    
-    public List<ScreenWallpaper> getData() {
-    	List<ScreenWallpaper> datas = new ArrayList<>();
-    	
-    	for (ScreenView sv : screens.values()) {
-    		datas.add(sv.getData());
-    	}
-    	
-    	return datas;
     }
     
     public void setSelectedScreen(Screen screen) {

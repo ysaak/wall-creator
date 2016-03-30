@@ -23,10 +23,10 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import info.seravee.business.config.ConfigurationManager;
-import info.seravee.business.workers.SaveImageWorker;
 import info.seravee.utils.SwingUtils;
 import info.seravee.wallcreator.beans.Profile;
 import info.seravee.wallcreator.business.workers.RestoreProfileWorker;
+import info.seravee.wallcreator.business.workers.SaveImageWorker;
 import info.seravee.wallcreator.business.workers.StoreProfileWorker;
 import info.seravee.wallcreator.ui.components.GBCHelper;
 import info.seravee.wallcreator.ui.components.SolarizedColor;
@@ -104,7 +104,7 @@ public class DesktopPanel {
                         file = new File(file.getAbsolutePath() + ".png");
                     }
 
-                    new SaveImageWorker(file, screensViewPanel.getData()).execute();
+                    new SaveImageWorker(file, (Profile) profilesList.getSelectedItem()).execute();
                 }
             }
         });
