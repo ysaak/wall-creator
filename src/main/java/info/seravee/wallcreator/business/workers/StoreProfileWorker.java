@@ -16,14 +16,16 @@ import info.seravee.wallcreator.utils.GraphicsUtilities;
 public class StoreProfileWorker extends SwingWorker<Void, Void> {
 
 	private final Profile profileToStore;
+	private final boolean setWallpaper;
 	
-	public StoreProfileWorker(final Profile profileToStore) {
+	public StoreProfileWorker(final Profile profileToStore, final boolean setWallpaper) {
 		this.profileToStore = profileToStore;
+		this.setWallpaper = setWallpaper;
 	}
 	
 	@Override
 	protected Void doInBackground() throws Exception {
-		
+
 		final BufferedImage wallpaper = GraphicsUtilities.generateProfileWallpaper(profileToStore);
 		
 		// output folder (create if necessary)
@@ -38,9 +40,10 @@ public class StoreProfileWorker extends SwingWorker<Void, Void> {
 		
 		ImageIO.write(wallpaper, "PNG", wallpaperFile);
 		
-		// Set wallpaper on desktop
-		Platforms.get().setWallpaper(wallpaperFile);
-		
+		if (setWallpaper) {
+			// Set wallpaper on desktop
+			Platforms.get().setWallpaper(wallpaperFile);
+		}
 		
 		// Store updated profile
 		Services.getProfileService().store(profileToStore);

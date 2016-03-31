@@ -45,6 +45,7 @@ public class DesktopPanel {
 	private final JButton saveImageButton;
 	
 	private final JButton saveButton;
+	private final JButton saveAndSetButton;
 	private final JButton cancelButton;
 	
 	private final Set<ProfileSelectionListener> profileSelectionListeners;
@@ -110,11 +111,19 @@ public class DesktopPanel {
         });
         
         // Buttons
-        saveButton = new JButton("Set wallpaper");
+        saveAndSetButton = new JButton("Save and set");
+        saveAndSetButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new StoreProfileWorker((Profile) profilesList.getSelectedItem(), true).execute();
+			}
+		});
+        
+        saveButton = new JButton("Save");
         saveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new StoreProfileWorker((Profile) profilesList.getSelectedItem()).execute();
+				new StoreProfileWorker((Profile) profilesList.getSelectedItem(), false).execute();
 			}
 		});
         
@@ -142,7 +151,8 @@ public class DesktopPanel {
 		gbc.addAnchoredComponent(saveImageButton, 0, 0, GridBagConstraints.LINE_START);
 		gbc.addComponent(Box.createHorizontalGlue(), 1, 0, 1.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
 		gbc.addAnchoredComponent(saveButton, 2, 0, GridBagConstraints.LINE_START);
-		gbc.addAnchoredComponent(cancelButton, 3, 0, GridBagConstraints.LINE_START);
+		gbc.addAnchoredComponent(saveAndSetButton, 3, 0, GridBagConstraints.LINE_START);
+		gbc.addAnchoredComponent(cancelButton, 4, 0, GridBagConstraints.LINE_START);
 
 		SwingUtils.setSMPSizes(screensViewPanel, new Dimension(screensViewPanel.getPreferredSize().width, 225));
 		
