@@ -1,6 +1,8 @@
 package info.seravee.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Image;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -36,7 +38,7 @@ public class CreatorFrame {
     public CreatorFrame() {
         frame = new JFrame("Wall creator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setIconImage(GraphicsUtilities.iconToImage(new AppIcon()));
+        frame.setIconImages(getFrameIcons());
         
         mainTabbedPane = new NavigationPane();
         
@@ -93,5 +95,17 @@ public class CreatorFrame {
     protected void wallpaperSelectedForDesktop(Wallpaper wallpaper, int desktopIndex) {
     	// FIXME review
     	//desktopPanel.setWallpaper(wallpaper.getFile(), desktopIndex);
+    }
+    
+    private List<Image> getFrameIcons() {
+    	List<Image> icons = new ArrayList<Image>();
+    	
+    	icons.add(GraphicsUtilities.iconToImage(AppIcon.get16()));
+    	icons.add(GraphicsUtilities.iconToImage(AppIcon.get32()));
+    	icons.add(GraphicsUtilities.iconToImage(AppIcon.get48()));
+    	icons.add(GraphicsUtilities.iconToImage(AppIcon.get64()));
+    	icons.add(GraphicsUtilities.iconToImage(AppIcon.get128()));
+    	
+    	return icons;
     }
 }

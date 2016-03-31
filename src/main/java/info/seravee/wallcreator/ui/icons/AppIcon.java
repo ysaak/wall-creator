@@ -9,14 +9,50 @@ import java.awt.geom.GeneralPath;
 
 import javax.swing.Icon;
 
+import info.seravee.wallcreator.ui.components.LafUtils;
+
 public class AppIcon implements Icon {
 	
-	private static final int FACTOR = 1;
-	private boolean withBorder = true;
+	public static final AppIcon get16() {
+		return new AppIcon(1);
+	}
+	
+	public static final AppIcon get32() {
+		return new AppIcon(2);
+	}
+	
+	public static final AppIcon get48() {
+		return new AppIcon(3);
+	}
+	
+	public static final AppIcon get64() {
+		return new AppIcon(4);
+	}
+	
+	public static final AppIcon get128() {
+		return new AppIcon(8);
+	}
+	
+	public static final AppIcon getTrayIcon() {
+		return new AppIcon(1, true);
+	}
+	
+	private final int factor;
+	private final boolean withBorder;
+	
+	private AppIcon(int factor) {
+		this(factor, false);
+	}
+	
+	private AppIcon(int factor, boolean withBorder) {
+		this.factor = factor;
+		this.withBorder = withBorder;
+	}
 
 	@Override
 	public void paintIcon(Component c, Graphics g, int x, int y) {
 		Graphics2D g2 = (Graphics2D) g;
+		g2.setRenderingHints(LafUtils.ANTIALIASING_HINTS);
 		Color oldColor = g.getColor();
 		
 		g.translate(x, y);
@@ -67,10 +103,10 @@ public class AppIcon implements Icon {
 
 		GeneralPath polyline = new GeneralPath(GeneralPath.WIND_EVEN_ODD, xPoints.length);
 
-		polyline.moveTo(xPoints[0] * FACTOR, yPoints[0] * FACTOR);
+		polyline.moveTo(xPoints[0] * factor, yPoints[0] * factor);
 
 		for (int index = 1; index < xPoints.length; index++) {
-			polyline.lineTo(xPoints[index] * FACTOR, yPoints[index] * FACTOR);
+			polyline.lineTo(xPoints[index] * factor, yPoints[index] * factor);
 		}
 
 		polyline.closePath();
@@ -81,12 +117,12 @@ public class AppIcon implements Icon {
 
 	@Override
 	public int getIconWidth() {
-		return 16 * FACTOR;
+		return 16 * factor;
 	}
 
 	@Override
 	public int getIconHeight() {
-		return 16 * FACTOR;
+		return 16 * factor;
 	}
 
 }
