@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import info.seravee.utils.ImageScalerUtils;
 import info.seravee.wallcreator.beans.Profile;
@@ -698,6 +700,22 @@ public class GraphicsUtilities {
         } finally {
             g.dispose();
         }
+    }
+    
+    /* ---------------------------------------------------------------------------- */
+    
+    public static Image iconToImage(Icon icon) {
+    	if (icon instanceof ImageIcon) {
+    		return ((ImageIcon) icon).getImage();
+    	}
+    	else {
+
+			BufferedImage image = createCompatibleTranslucentImage(icon.getIconWidth(), icon.getIconHeight());
+			Graphics2D g = image.createGraphics();
+			icon.paintIcon(null, g, 0, 0);
+			g.dispose();
+			return image;
+		}
     }
     
     /* ---------------------------------------------------------------------------- */

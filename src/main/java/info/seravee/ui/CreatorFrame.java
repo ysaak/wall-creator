@@ -12,11 +12,13 @@ import info.seravee.wallcreator.beans.Profile;
 import info.seravee.wallcreator.ui.GuiConstants;
 import info.seravee.wallcreator.ui.IconTestPanel;
 import info.seravee.wallcreator.ui.event.ProfileSelectionListener;
+import info.seravee.wallcreator.ui.icons.AppIcon;
 import info.seravee.wallcreator.ui.icons.navigation.GearIcon;
 import info.seravee.wallcreator.ui.icons.navigation.MonitorIcon;
 import info.seravee.wallcreator.ui.icons.navigation.WallpapersIcon;
 import info.seravee.wallcreator.ui.navigation.NavigationPane;
 import info.seravee.wallcreator.ui.screens.DesktopPanel;
+import info.seravee.wallcreator.utils.GraphicsUtilities;
 
 /**
  * Created by ysaak on 27/01/15.
@@ -34,6 +36,7 @@ public class CreatorFrame {
     public CreatorFrame() {
         frame = new JFrame("Wall creator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setIconImage(GraphicsUtilities.iconToImage(new AppIcon()));
         
         mainTabbedPane = new NavigationPane();
         
