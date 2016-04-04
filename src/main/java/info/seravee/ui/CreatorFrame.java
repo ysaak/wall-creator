@@ -8,12 +8,15 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import info.seravee.data.lister.Wallpaper;
+import com.google.common.eventbus.Subscribe;
+
 import info.seravee.ui.lister.ImageListerPanel;
 import info.seravee.wallcreator.beans.Profile;
+import info.seravee.wallcreator.business.Services;
+import info.seravee.wallcreator.events.NewProfileEvent;
+import info.seravee.wallcreator.events.SelectedProfileEvent;
 import info.seravee.wallcreator.ui.GuiConstants;
 import info.seravee.wallcreator.ui.IconTestPanel;
-import info.seravee.wallcreator.ui.event.ProfileSelectionListener;
 import info.seravee.wallcreator.ui.icons.AppIcon;
 import info.seravee.wallcreator.ui.icons.navigation.GearIcon;
 import info.seravee.wallcreator.ui.icons.navigation.MonitorIcon;
@@ -32,8 +35,9 @@ public class CreatorFrame {
     private final ImageListerPanel imageListerPanel;
     
     private final NavigationPane mainTabbedPane;
-    
-    
+
+
+    private final ProfileEventSubscriber profileEventSubscriber;
 
     public CreatorFrame() {
         frame = new JFrame("Wall creator");
@@ -43,26 +47,14 @@ public class CreatorFrame {
         mainTabbedPane = new NavigationPane();
         
         desktopPanel = new DesktopPanel();
-        desktopPanel.addProfileSelectionListener(new ProfileSelectionListener() {
-			
-			@Override
-			public void profileSelected(final Profile profile) {
-				imageListerPanel.setSelectedProfile(profile);
-			}
-		});
-        
         imageListerPanel = new ImageListerPanel();
-        imageListerPanel.setWallpaperSelectionListener(new WallpaperSelectionListener() {
-			@Override
-			public void wallpaperSelected(Wallpaper wallpaper, int desktop) {
-				wallpaperSelectedForDesktop(wallpaper, desktop);
-			}
-		});
 
         buildFrame();
-        //frame.setSize(new Dimension(811, 500));
         frame.pack();
         frame.setLocationRelativeTo(null);
+        
+        profileEventSubscriber = new ProfileEventSubscriber();
+        Services.getEventService().register(profileEventSubscriber);
     }
 
     private void buildFrame() {
@@ -92,11 +84,6 @@ public class CreatorFrame {
         frame.setVisible(true);
     }
     
-    protected void wallpaperSelectedForDesktop(Wallpaper wallpaper, int desktopIndex) {
-    	// FIXME review
-    	//desktopPanel.setWallpaper(wallpaper.getFile(), desktopIndex);
-    }
-    
     private List<Image> getFrameIcons() {
     	List<Image> icons = new ArrayList<Image>();
     	
@@ -107,5 +94,18 @@ public class CreatorFrame {
     	icons.add(GraphicsUtilities.iconToImage(AppIcon.get128()));
     	
     	return icons;
+    }
+    
+    private class ProfileEventSubscriber {
+    	@Subscribe
+    	public void handleNewProfileEvent(NewProfileEvent event) {
+    		desktopPanel.profileAdded(event.getNewProfile());
+    	}
+    	
+    	@Subscribe
+    	public void handleSelectedProfileEvent(SelectedProfileEvent event) {
+    		desktopPanel.profileSelected(event.getSelectedProfile());
+    		imageListerPanel.setSelectedProfile(event.getSelectedProfile());
+    	}
     }
 }

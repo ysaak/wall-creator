@@ -8,7 +8,7 @@ import java.beans.PropertyChangeSupport;
 import info.seravee.DefaultConfiguration;
 import info.seravee.data.ScalingAlgorithm;
 
-public class Screen {
+public class Screen implements Cloneable {
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 	
 	// Base data for the screen
@@ -118,6 +118,10 @@ public class Screen {
 		setBackgroundColor(screen.getBackgroundColor());
 		setScalingAlgorithm(screen.getScalingAlgorithm());
 		setImage(screen.getImage());
+	}
+	
+	public Screen clone() throws CloneNotSupportedException {
+		return (Screen) super.clone();
 	}
 	
 	/* ---- */

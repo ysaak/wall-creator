@@ -3,10 +3,18 @@ package info.seravee.wallcreator.business;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.eventbus.EventBus;
+
 import info.seravee.wallcreator.business.profiles.ProfileManager;
 import info.seravee.wallcreator.business.profiles.ProfileService;
 
 public final class Services {
+	
+	private static final EventBus EVENT_BUS = new EventBus();
+	
+	public static EventBus getEventService() {
+		return EVENT_BUS;
+	}
 	
 	public static ProfileService getProfileService() {
 		ProfileService service = getInstance(ProfileService.class);

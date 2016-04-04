@@ -39,7 +39,6 @@ import info.seravee.business.exceptions.ConfigurationException;
 import info.seravee.data.config.Configuration;
 import info.seravee.data.config.DialogLastFolderType;
 import info.seravee.data.lister.Wallpaper;
-import info.seravee.ui.WallpaperSelectionListener;
 import info.seravee.ui.lister.ImageLoadingWorker.LoadingWorkerListener;
 import info.seravee.utils.SwingUtils;
 import info.seravee.wallcreator.beans.Profile;
@@ -64,8 +63,6 @@ public class ImageListerPanel {
 	private final JList<Wallpaper> imageList;
 
 	private final JPanel listerPanel;
-
-	private WallpaperSelectionListener wallpaperSelectionListener = null;
 
 	private final XButton addFolderButton;
 	private final XButton removeFolderButton;
@@ -236,12 +233,6 @@ public class ImageListerPanel {
 			worker.execute();
 		}
 	}
-
-	public void setWallpaperSelectionListener(WallpaperSelectionListener wallpaperSelectionListener) {
-		this.wallpaperSelectionListener = wallpaperSelectionListener;
-	}
-	
-
 
 	public void setSelectedProfile(final Profile profile) {
 		this.selectedProfile = profile;

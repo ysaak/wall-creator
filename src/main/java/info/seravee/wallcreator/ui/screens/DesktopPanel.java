@@ -7,9 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -19,18 +17,21 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import info.seravee.business.config.ConfigurationManager;
 import info.seravee.utils.SwingUtils;
 import info.seravee.wallcreator.beans.Profile;
+import info.seravee.wallcreator.business.Services;
+import info.seravee.wallcreator.business.workers.DuplicateProfileWorker;
 import info.seravee.wallcreator.business.workers.RestoreProfileWorker;
 import info.seravee.wallcreator.business.workers.SaveImageWorker;
 import info.seravee.wallcreator.business.workers.StoreProfileWorker;
+import info.seravee.wallcreator.events.SelectedProfileEvent;
 import info.seravee.wallcreator.ui.components.GBCHelper;
 import info.seravee.wallcreator.ui.components.SolarizedColor;
-import info.seravee.wallcreator.ui.event.ProfileSelectionListener;
 
 public class DesktopPanel {
 	private final JPanel desktopPanel;
@@ -48,11 +49,11 @@ public class DesktopPanel {
 	private final JButton saveAndSetButton;
 	private final JButton cancelButton;
 	
-	private final Set<ProfileSelectionListener> profileSelectionListeners;
+	private final JButton duplicateProfileButton;
+	
+	private boolean updateInProgress = false;
 	
 	public DesktopPanel() {
-		profileSelectionListeners = new HashSet<>();
-		
 		desktopPanel = new JPanel();
 		
 		// Profiles list
@@ -136,6 +137,22 @@ public class DesktopPanel {
 		});
         
         
+        
+        /*------*/
+        duplicateProfileButton = new JButton("Duplicate");
+        duplicateProfileButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				final String newProfileName = JOptionPane.showInputDialog(getDisplay(), "Name", "Enter new profile name", JOptionPane.QUESTION_MESSAGE);
+				if (newProfileName != null) {
+					new DuplicateProfileWorker((Profile) profilesList.getSelectedItem(), newProfileName).execute();
+				}
+			}
+		});
+        
+        
 	}
 	
 	public void buildPanel() {
@@ -157,13 +174,25 @@ public class DesktopPanel {
 		SwingUtils.setSMPSizes(screensViewPanel, new Dimension(screensViewPanel.getPreferredSize().width, 225));
 		
 		gbc = new GBCHelper(desktopPanel);
-		gbc.addComponent(profilesList, 0, 0, 0.0, 0.0, 2, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
+		gbc.addComponent(buildProfilePanel(), 0, 0, 0.0, 0.0, 2, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
         gbc.addComponent(screensViewPanel, 0, 1, 1.0, 1.0, 2, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.BOTH);
 		gbc.addComponent(parametersPanel.getDisplay(), 0, 2, 1.0, 1.5, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.BOTH);
 		gbc.addComponent(buttonsPanel, 0, 3, 0.0, 0.0, 2, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL);
         
         
         gbc.addComponent(Box.createHorizontalGlue(), 1, 2, 3.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GBCHelper.DEFAULT_FILL);
+	}
+	
+	private JPanel buildProfilePanel() {
+		JPanel profilePanel = new JPanel();
+		profilePanel.setOpaque(false);
+		
+		GBCHelper gbc = new GBCHelper(profilePanel);
+		gbc.addComponent(profilesList, 0, 0, 1.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
+		gbc.addAnchoredComponent(duplicateProfileButton, 1, 0, GridBagConstraints.LINE_START);
+
+		
+		return profilePanel;
 	}
 	
 	public JPanel getDisplay() {
@@ -191,32 +220,22 @@ public class DesktopPanel {
 		
 	}
 	
-	private void setSelectedProfile(final Profile profile) {
+	protected void fireProfileSelected(final Profile profile) {
+		if (!updateInProgress)
+			Services.getEventService().post(new SelectedProfileEvent(profile));
+		//setSelectedProfile(profile);
+	}
+	
+	public void profileAdded(Profile profile) {
+		profilesModel.addElement(profile);
+	}
+	
+	public void profileSelected(Profile profile) {
+		updateInProgress = true;
 		profilesList.setSelectedItem(profile);
 		screensViewPanel.setScreens(profile.getScreens());
 		screensViewPanel.setSelectedScreen(profile.getScreens().get(0));
 		parametersPanel.setCurrentScreen(profile.getScreens().get(0));
-	}
-	
-	protected void fireProfileSelected(final Profile profile) {
-		setSelectedProfile(profile);
-		
-		synchronized (profileSelectionListeners) {
-			for(ProfileSelectionListener l : profileSelectionListeners) {
-				l.profileSelected(profile);
-			}
-		}
-	}
-	
-	public void addProfileSelectionListener(ProfileSelectionListener l) {
-		synchronized (profileSelectionListeners) {
-			profileSelectionListeners.add(l);
-		}
-	}
-	
-	public void removeScreenListener(ProfileSelectionListener l) {
-		synchronized (profileSelectionListeners) {
-			profileSelectionListeners.remove(l);
-		}
+		updateInProgress = false;
 	}
 }
