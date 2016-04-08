@@ -10,7 +10,7 @@ import javax.swing.ButtonModel;
 import javax.swing.JComponent;
 import javax.swing.plaf.basic.BasicButtonUI;
 
-import info.seravee.wallcreator.ui.components.LafUtils;
+import info.seravee.wallmanager.ui.commons.laf.LafUtils;
 
 public class XButtonUI extends BasicButtonUI {
 	

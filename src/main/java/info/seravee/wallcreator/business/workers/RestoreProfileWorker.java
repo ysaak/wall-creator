@@ -4,11 +4,10 @@ import java.io.IOException;
 
 import javax.swing.SwingWorker;
 
-import info.seravee.wallcreator.beans.Profile;
-import info.seravee.wallcreator.beans.Screen;
-import info.seravee.wallcreator.business.Services;
+import info.seravee.wallmanager.beans.profile.Profile;
+import info.seravee.wallmanager.business.Services;
 
-public class RestoreProfileWorker extends SwingWorker<Void, Void> {
+public class RestoreProfileWorker extends SwingWorker<Profile, Void> {
 	
 	private final Profile profileToRestore;
 	
@@ -22,7 +21,7 @@ public class RestoreProfileWorker extends SwingWorker<Void, Void> {
 	}
 
 	@Override
-	protected Void doInBackground() throws Exception {
+	protected Profile doInBackground() throws Exception {
 		
 		final Profile storedProfile;
 		try {
@@ -32,17 +31,9 @@ public class RestoreProfileWorker extends SwingWorker<Void, Void> {
 			throw e; 
 		}
 		
+		profileToRestore.setVersions(storedProfile.getVersions());
 		
-		for (Screen opScreen : profileToRestore.getScreens()) {
-			for (Screen spScreen : storedProfile.getScreens()) {
-				if (opScreen.getId() == spScreen.getId()) {
-					opScreen.copyFrom(spScreen);
-					break;
-				}
-			}
-		}
-
-		return null;
+		return profileToRestore;
 	}
 
 }

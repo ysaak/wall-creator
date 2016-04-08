@@ -26,6 +26,7 @@ public final class YamlUtils {
 		return new Representer();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static final <T> T load(Yaml yaml, Path file) throws IOException {
 		try (Reader input = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
 			return (T) yaml.load(input);

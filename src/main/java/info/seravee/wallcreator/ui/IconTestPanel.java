@@ -8,7 +8,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 
 import info.seravee.wallcreator.ui.components.button.XButton;
-import info.seravee.wallcreator.ui.icons.PlusIcon;
+import info.seravee.wallmanager.ui.commons.icons.PlusIcon;
 
 public class IconTestPanel extends JPanel {
 

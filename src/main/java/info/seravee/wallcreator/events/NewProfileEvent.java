@@ -1,6 +1,6 @@
 package info.seravee.wallcreator.events;
 
-import info.seravee.wallcreator.beans.Profile;
+import info.seravee.wallmanager.beans.profile.Profile;
 
 public class NewProfileEvent {
 	private final Profile newProfile;

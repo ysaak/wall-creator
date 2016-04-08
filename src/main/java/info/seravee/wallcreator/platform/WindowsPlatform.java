@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.google.common.io.Files;
+
 import info.seravee.business.files.FileUtils;
 
 public class WindowsPlatform extends AbstractPlaform {
@@ -17,6 +19,19 @@ public class WindowsPlatform extends AbstractPlaform {
 	
 	@Override
 	public void setWallpaper(File wallpaper) {
+		
+		
+		File tempWallpaper = getAppDirectory().resolve("wallpaper.png").toFile();
+		
+		// Copy wallpaper to temp location
+		try {
+			Files.copy(wallpaper, tempWallpaper);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return;
+		}
+		
+		
 		
 		// Generate ouput file
 		final Path outfile = Paths.get(getAppDirectory().toString(), "wallsetter.ps1");
@@ -34,7 +49,7 @@ public class WindowsPlatform extends AbstractPlaform {
 			System.err.println(wallpaper.toString());
 			
 			setterProcess = Runtime.getRuntime().exec(new String[] {
-					"powershell.exe", "-file", outfile.toString(), wallpaper.toString()
+					"powershell.exe", "-file", outfile.toString(), tempWallpaper.toString()
 			});
 			setterProcess.waitFor();
 		} catch (IOException e) {
