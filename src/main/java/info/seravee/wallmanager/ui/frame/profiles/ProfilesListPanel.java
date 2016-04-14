@@ -1,6 +1,5 @@
 package info.seravee.wallmanager.ui.frame.profiles;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -20,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import info.seravee.wallcreator.ui.components.GBCHelper;
+import info.seravee.wallcreator.ui.components.SolarizedColor;
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
@@ -51,7 +51,7 @@ public final class ProfilesListPanel {
 	private final JButton versionDeleteButton;
 
 	public ProfilesListPanel() {
-		this.panel = new JXPanel().allRounded();
+		this.panel = new JXPanel();
 
 		// Profiles list
 		profileLabel = new JLabel("Profile");
@@ -228,7 +228,7 @@ public final class ProfilesListPanel {
 	}
 
 	public void buildPanel() {
-		panel.setBackground(Color.WHITE);
+		panel.setBackground(SolarizedColor.BASE03);
 		
 		GBCHelper gbc = new GBCHelper(panel);
 		gbc.addComponent(profileLabel, 0, 0);

@@ -4,11 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,16 +27,14 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.Timer;
-import javax.swing.border.EmptyBorder;
 
 import info.seravee.wallcreator.ui.GuiConstants;
-import info.seravee.wallcreator.ui.components.GBCHelper;
 import info.seravee.wallmanager.ui.commons.icons.navigation.NavigationIcon;
 
-class NavigationPane {
+class NavigationTabbedPane {
 
 	public enum TabLocation {
-		TOP, BOTTOM
+		LEFT, RIGHT
 	}
 	
 	private final JPanel mainPanel;
@@ -48,8 +46,8 @@ class NavigationPane {
 	private final Map<String, TabButton> tabButtonMap = new HashMap<String, TabButton>(50);
 
 	private int tabCount = 0;
-	private final List<TabButton> topTabButtonList = new ArrayList<>();
-	private final List<TabButton> bottomTabButtonList = new ArrayList<>();
+	private final List<TabButton> leftTabButtonList = new ArrayList<>();
+	private final List<TabButton> rightTabButtonList = new ArrayList<>();
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 
 	private final ItemListener itemListener = new ItemListener() {
@@ -58,7 +56,7 @@ class NavigationPane {
 		public void itemStateChanged(final ItemEvent e) { tabItemEvent(e); }
 	};
 
-	public NavigationPane() {
+	public NavigationTabbedPane() {
 		mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setOpaque(false);
 
@@ -77,16 +75,24 @@ class NavigationPane {
 		buttonsPanel.setMinimumSize(buttonBarSize);
 
 		
-		mainPanel.add(buttonsPanel, BorderLayout.WEST);
+		mainPanel.add(buttonsPanel, BorderLayout.NORTH);
 		mainPanel.add(panelsPanel, BorderLayout.CENTER);
 	}
 
-	public void addTopTab(final NavigationIcon icon, String name, final JComponent component) {
-		addTab(TabLocation.TOP, icon, name, component, true);
+	public void addLeftTab(final NavigationIcon icon, String name, final JComponent component) {
+		addLeftTab(icon, name, component, false);
+	}
+
+	public void addLeftTab(final NavigationIcon icon, String name, final JComponent component, final boolean iconOnly) {
+		addTab(TabLocation.LEFT, icon, name, component, iconOnly);
 	}
 	
-	public void addBottomTab(final NavigationIcon icon, String name, final JComponent component) {
-		addTab(TabLocation.BOTTOM, icon, name, component, true);
+	public void addRightTab(final NavigationIcon icon, String name, final JComponent component) {
+		addRightTab(icon, name, component, false);
+	}
+
+	public void addRightTab(final NavigationIcon icon, String name, final JComponent component, final boolean iconOnly) {
+		addTab(TabLocation.RIGHT, icon, name, component, iconOnly);
 	}
 	
 	private void addTab(final TabLocation location, final NavigationIcon icon, final String name, final JComponent component, final boolean iconOnly) {
@@ -96,10 +102,10 @@ class NavigationPane {
 			TabButton tb = new TabButton(icon, name, iconOnly);
 			tabButtonMap.put(name, tb);
 
-			if (location == TabLocation.TOP) {
-				topTabButtonList.add(tb);
+			if (location == TabLocation.LEFT) {
+				leftTabButtonList.add(tb);
 			} else {
-				bottomTabButtonList.add(tb);
+				rightTabButtonList.add(tb);
 			}
 
 			tb.addItemListener(itemListener);
@@ -116,35 +122,26 @@ class NavigationPane {
 	
 	private void buildButtonsPanel() {
 		buttonsPanel.removeAll();
-		buttonsPanel.setBorder(new EmptyBorder(GuiConstants.BASE_SPACER, 0, GuiConstants.BASE_SPACER, 0));
 		
-		JPanel topButtonsPanel = new JPanel(true);
-		topButtonsPanel.setOpaque(false);
-
-		GBCHelper gblh = new GBCHelper(topButtonsPanel, new Insets(5, 0, 5, 0));
+		JPanel leftButtonsPanel = new JPanel(true);
+		leftButtonsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, GuiConstants.BASE_SPACER, 0));
+		leftButtonsPanel.setOpaque(false);
 		
-		int index = 0;
-		for (TabButton tb : topTabButtonList) {
-			gblh.addComponent(tb, 0, index);
-			index++;
+		for (TabButton tb : leftTabButtonList) {
+			leftButtonsPanel.add(tb);
 		}
 		
-		buttonsPanel.add(topButtonsPanel, BorderLayout.NORTH);
+		buttonsPanel.add(leftButtonsPanel, BorderLayout.WEST);
 		
+		JPanel rightButtonsPanel = new JPanel(true);
+		rightButtonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, GuiConstants.BASE_SPACER, 0));
+		rightButtonsPanel.setOpaque(false);
 		
-		
-		JPanel bottomButtonsPanel = new JPanel(true);
-		
-		gblh = new GBCHelper(bottomButtonsPanel, new Insets(5, 0, 5, 0));
-		bottomButtonsPanel.setOpaque(false);
-		
-		index = 0;
-		for (TabButton tb : bottomTabButtonList) {
-			gblh.addComponent(tb, 0, index);
-			index++;
+		for (TabButton tb : rightTabButtonList) {
+			rightButtonsPanel.add(tb);
 		}
-
-		buttonsPanel.add(bottomButtonsPanel, BorderLayout.SOUTH);
+		
+		buttonsPanel.add(rightButtonsPanel, BorderLayout.EAST);
 	}
 	
 
@@ -162,7 +159,7 @@ class NavigationPane {
 	private static final class TabButton extends JToggleButton {
 		private static final long serialVersionUID = 945023396844547747L;
 
-		public static final int TAB_BUTTON_HEIGHT = 50;
+		public static final int TAB_BUTTON_HEIGHT = 40;
 		private static final int ARC_SIZE = 10;
 		
 		// Animation parameters
@@ -175,11 +172,13 @@ class NavigationPane {
 		private float bgOpacity = 0f;
 		
 		private final NavigationIcon icon;
+		private final boolean iconOnly;
 
 		public TabButton(final NavigationIcon icon, final String name, final boolean iconOnly) {
 			setName(name);
 			
 			this.icon = icon;
+			this.iconOnly = iconOnly;
 			
 			setText(!iconOnly ? name: "");
 			setToolTipText(name);
@@ -192,10 +191,10 @@ class NavigationPane {
 			
 			final int w;
 			if (iconOnly) {
-				w = TAB_BUTTON_HEIGHT; 
+				w = 50; 
 			}
 			else {
-				w = getPreferredSize().width + TAB_BUTTON_HEIGHT; // 30px for icon, 20px for spaces
+				w = getPreferredSize().width + 50; // 30px for icon, 20px for spaces
 			}
 			
 			
@@ -268,10 +267,14 @@ class NavigationPane {
 			// Draw the background
 			g2.setColor(bgColor);
 			
-			g2.fillRect(0, 0, w, h);
+			g2.fillRect(0, ARC_SIZE, w, h-ARC_SIZE);
+			g2.fillRect(ARC_SIZE, 0, w-(ARC_SIZE * 2), ARC_SIZE);
+			
+			g2.fillArc(0, 0, ARC_SIZE * 2, ARC_SIZE * 2, 90, 90);
+			g2.fillArc(w - (ARC_SIZE * 2), 0, ARC_SIZE * 2, ARC_SIZE * 2, 0, 90);
 
 			// Paint icon
-			icon.paintIcon(this, g2, ARC_SIZE, ARC_SIZE);
+			icon.paintIcon(this, g2, ARC_SIZE, ARC_SIZE / 2);
 			
 			// Draw the text
 			g2.setColor(fgColor);

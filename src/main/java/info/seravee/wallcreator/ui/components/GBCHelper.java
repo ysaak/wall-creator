@@ -42,6 +42,10 @@ public class GBCHelper {
 		addComponent(c, gridX, gridY, DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_ANCHOR, DEFAULT_FILL);
 	}
 	
+	public void addComponent(Component c, int gridX, int gridY, final Insets insets) {
+		addComponent(c, gridX, gridY, DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_ANCHOR, DEFAULT_FILL, insets);
+	}
+	
 	public void addComponent(Component c, int gridX, int gridY, double weightX, double weightY, int width, int height, int anchor, int fill) {
 		addComponent(c, gridX, gridY, weightX, weightY, width, height, anchor, fill, baseInsets);
 	}

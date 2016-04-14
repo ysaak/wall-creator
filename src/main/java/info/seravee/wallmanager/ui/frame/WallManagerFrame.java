@@ -17,6 +17,8 @@ import info.seravee.wallcreator.utils.GraphicsUtilities;
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.business.Services;
 import info.seravee.wallmanager.business.events.EventBusLine;
+import info.seravee.wallmanager.ui.commons.components.LockableFrame;
+import info.seravee.wallmanager.ui.commons.frame.WMFrame;
 import info.seravee.wallmanager.ui.commons.icons.AppIcon;
 import info.seravee.wallmanager.ui.commons.icons.navigation.GearIcon;
 import info.seravee.wallmanager.ui.commons.icons.navigation.MonitorIcon;
@@ -27,7 +29,7 @@ import info.seravee.wallmanager.ui.frame.profiles.ProfilesListPanel;
 import info.seravee.wallmanager.ui.frame.wallpapers.WallpapersListListener;
 import info.seravee.wallmanager.ui.frame.wallpapers.WallpapersListPanel;
 
-public class WallManagerFrame {
+public class WallManagerFrame implements LockableFrame {
     private final JFrame frame;
     
     private final ProfilesListPanel profilesListPanel;
@@ -40,7 +42,7 @@ public class WallManagerFrame {
     private final ProfileEventSubscriber profileEventSubscriber;
 
     public WallManagerFrame() {
-        frame = new JFrame("Wall creator");
+        frame = new WMFrame("Wall creator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setIconImages(getFrameIcons());
         
@@ -69,8 +71,8 @@ public class WallManagerFrame {
 
     private void buildFrame() {
         JComponent contentPane = (JComponent) frame.getContentPane();
-        contentPane.setBorder(GuiConstants.BASE_EMPTY_BORDER);
-        contentPane.setLayout(new BorderLayout(10, 10));
+        //contentPane.setBorder(GuiConstants.BASE_EMPTY_BORDER);
+        contentPane.setLayout(new BorderLayout(0,0));
         contentPane.setBackground(GuiConstants.MAIN_BACKGROUND_COLOR);
         
         // Profile selection
@@ -80,13 +82,13 @@ public class WallManagerFrame {
         // --- Navigation
         // Desktop Editor
         desktopEditorPanel.buildPanel();
-        mainTabbedPane.addLeftTab(new MonitorIcon(), "Editor", desktopEditorPanel.getDisplay());
+        mainTabbedPane.addTopTab(new MonitorIcon(), "Editor", desktopEditorPanel.getDisplay());
         
         wallpaperListPanel.buildPanel();
-        mainTabbedPane.addLeftTab(new WallpapersIcon(), "Wallpapers", wallpaperListPanel.getDisplay());
+        mainTabbedPane.addTopTab(new WallpapersIcon(), "Wallpapers", wallpaperListPanel.getDisplay());
         
         
-        mainTabbedPane.addRightTab(new GearIcon(), "Parameters", new IconTestPanel(), true);
+        mainTabbedPane.addBottomTab(new GearIcon(), "Parameters", new IconTestPanel());
         
         
         contentPane.add(mainTabbedPane.getDisplay(), BorderLayout.CENTER);
@@ -117,5 +119,17 @@ public class WallManagerFrame {
     	public void handleSelectedProfileEvent(ProfileSelectedEvent event) {
     		wallpaperListPanel.setSelectedProfile(event.getProfile());
     	}
+    }
+    
+    @Override
+    public void lockScreen(boolean lock) {
+    	// TODO Auto-generated method stub
+    	
+    }
+    
+    @Override
+    public void lockScreen(boolean lock, String message) {
+    	// TODO Auto-generated method stub
+    	
     }
 }
