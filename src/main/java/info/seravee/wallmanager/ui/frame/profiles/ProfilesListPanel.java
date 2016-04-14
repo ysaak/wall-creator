@@ -47,6 +47,7 @@ public final class ProfilesListPanel {
 	
 	private final JButton versionAddButton;
 	private final JButton versionRenameButton; 
+	private final JButton versionSetPreferredButton;
 	private final JButton versionDeleteButton;
 
 	public ProfilesListPanel() {
@@ -126,6 +127,27 @@ public final class ProfilesListPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				fireProfileVersionSelected((ProfileVersion) profilesVersionList.getSelectedItem());
+			}
+		});
+		
+		versionSetPreferredButton = new JButton("Preferred");
+		versionSetPreferredButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				final Profile p = getSelectedProfile();
+				final ProfileVersion pv = getSelectedVersion();
+				
+				try {
+					Services.getProfileService().setPreferredVersion(p, pv);
+					
+					
+					versionSetPreferredButton.setEnabled(false);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		
@@ -232,6 +254,7 @@ public final class ProfilesListPanel {
 		JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		buttonsPanel.setOpaque(false);
 		
+		buttonsPanel.add(versionSetPreferredButton);
 		buttonsPanel.add(versionRenameButton);
 		buttonsPanel.add(new JSeparator(JSeparator.VERTICAL));
 		buttonsPanel.add(versionAddButton);
@@ -297,6 +320,9 @@ public final class ProfilesListPanel {
 	protected void fireProfileVersionSelected(ProfileVersion version) {
 		if (version != null) {
 			Services.getEventService().post(EventBusLine.FRAME, new ProfileVersionSelectedEvent(getSelectedProfile(), version));
+			
+			versionSetPreferredButton.setEnabled(!version.isPreferred());
+			
 		}
 	}
 }

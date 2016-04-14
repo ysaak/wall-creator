@@ -10,10 +10,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
+
+import com.google.common.base.Preconditions;
 
 import info.seravee.wallcreator.platform.Platforms;
 import info.seravee.wallcreator.utils.YamlUtils;
@@ -21,13 +25,16 @@ import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
+import info.seravee.wallmanager.business.exception.profile.ProfileStoreException;
 import info.seravee.wallmanager.business.profiles.yaml.ProfileContructor;
 import info.seravee.wallmanager.business.profiles.yaml.ProfileRepresenter;
 
 public class ProfileManager implements ProfileService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProfileService.class);
 
 	@Override
-	public List<Profile> list() throws IOException {
+	public List<Profile> list() throws ProfileStoreException {
 		List<Profile> profiles = new ArrayList<>();
 
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(getProfilesPath(), "*.yml")) {
@@ -35,6 +42,10 @@ public class ProfileManager implements ProfileService {
 			while (iterator.hasNext()) {
 				profiles.add((Profile) YamlUtils.load(getYamlObject(), iterator.next()));
 			}
+		}
+		catch (IOException e) {
+			LOGGER.error("Error while listing profile from directories");
+			throw new RuntimeException(e);
 		}
 		
 		if (profiles.size() == 0) {
@@ -58,10 +69,57 @@ public class ProfileManager implements ProfileService {
 	}
 
 	@Override
-	public void store(Profile profile) throws IOException {
-		Path file = getProfilesPath().resolve(profile.getId() + ".yml");
+	public void store(Profile profile) throws ProfileStoreException {
+		final Path file;
+		try {
+			file = getProfilesPath().resolve(profile.getId() + ".yml");
+		}
+		catch (IOException e) {
+			throw new ProfileStoreException("Error while creating profile folder", e);
+		}
+	
+		try {
+			YamlUtils.dump(getYamlObject(), file, profile);
+		}
+		catch (IOException e) {
+			throw new ProfileStoreException("Error while storing profile", e);
+		}
+	}
+	
+	/* --- Versions --- */
 
-		YamlUtils.dump(getYamlObject(), file, profile);
+	@Override
+	public Profile deleteVersion(Profile profile, ProfileVersion versionToDelete) throws IOException {
+		Preconditions.checkNotNull(profile);
+		Preconditions.checkNotNull(versionToDelete);
+		
+		profile.getVersions().remove(versionToDelete);
+		
+		if (versionToDelete.isPreferred()) {
+			profile.getVersions().get(0).setPreferred(true);
+		}
+		
+		
+		return profile;
+	}
+
+	@Override
+	public Profile setPreferredVersion(Profile profile, ProfileVersion preferredVersion) throws IOException, ProfileStoreException {
+		Preconditions.checkNotNull(profile);
+		Preconditions.checkNotNull(preferredVersion);
+		
+		if (!profile.getVersions().contains(preferredVersion)) {
+			LOGGER.warn("Version '" + preferredVersion.getName() + "' not contained in this profile '" + profile.getName() + "'");
+			return profile;
+		}
+		
+		for (ProfileVersion version : profile.getVersions()) {
+			version.setPreferred(version.equals(preferredVersion));
+		}
+		
+		store(profile);
+
+		return profile;
 	}
 	
 	/**

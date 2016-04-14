@@ -1,6 +1,5 @@
 package info.seravee.wallmanager;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -34,7 +33,7 @@ public class App
     	final List<Profile> profiles;
     	try {
 			profiles = Services.getProfileService().list();
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			System.exit(-1);
 			return;
