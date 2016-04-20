@@ -6,7 +6,9 @@ import java.util.Map;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
+import com.google.inject.Singleton;
 
+@Singleton
 public class EventManager implements EventService {
 	private final Multimap<EventBusLine, Object> subscribers;
 	private final Map<EventBusLine, EventBus> eventBuses;

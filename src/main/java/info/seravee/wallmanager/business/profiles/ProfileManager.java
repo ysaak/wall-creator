@@ -50,8 +50,7 @@ public class ProfileManager implements ProfileService {
 		
 		if (profiles.size() == 0) {
 			// No profile defined, create a default one
-			Profile defaultProfile = createDefaultProfile();
-			store(defaultProfile);
+			Profile defaultProfile = createProfile("Default");
 			profiles.add(defaultProfile);
 		}
 		
@@ -86,6 +85,33 @@ public class ProfileManager implements ProfileService {
 		}
 	}
 	
+	/* --- Profile's actions --- */
+	
+	@Override
+	public Profile createProfile(String name) throws ProfileStoreException {
+		Profile profile = new Profile();
+		profile.setName(name);
+		profile.setConfiguration(Platforms.get().getDesktopConfiguration());
+		
+		// Create default version
+		ProfileVersion version = new ProfileVersion();
+		version.setName("Default");
+		version.setPreferred(true);
+		
+		for (Screen screen : profile.getConfiguration()) {
+			WallpaperParameters parameters = new WallpaperParameters();
+			parameters.setScreenId(screen.getId());
+			
+			version.getParameters().add(parameters);
+		}
+		
+		profile.getVersions().add(version);
+		
+		store(profile);
+		
+		return profile;
+	}
+	
 	/* --- Versions --- */
 
 	@Override
@@ -105,9 +131,6 @@ public class ProfileManager implements ProfileService {
 
 	@Override
 	public Profile setPreferredVersion(Profile profile, ProfileVersion preferredVersion) throws IOException, ProfileStoreException {
-		Preconditions.checkNotNull(profile);
-		Preconditions.checkNotNull(preferredVersion);
-		
 		if (!profile.getVersions().contains(preferredVersion)) {
 			LOGGER.warn("Version '" + preferredVersion.getName() + "' not contained in this profile '" + profile.getName() + "'");
 			return profile;
@@ -122,32 +145,6 @@ public class ProfileManager implements ProfileService {
 		return profile;
 	}
 	
-	/**
-	 * Create a default profile based on the current desktop configuration
-	 * @return Default profile
-	 */
-	private Profile createDefaultProfile() {
-		Profile defaultProfile = new Profile();
-		defaultProfile.setName("Default");
-		defaultProfile.setConfiguration(Platforms.get().getDesktopConfiguration());
-		
-		// Create default version
-		ProfileVersion version = new ProfileVersion();
-		version.setName("Default");
-		version.setPreferred(true);
-		
-		for (Screen screen : defaultProfile.getConfiguration()) {
-			WallpaperParameters parameters = new WallpaperParameters();
-			parameters.setScreenId(screen.getId());
-			
-			version.getParameters().add(parameters);
-		}
-		
-		defaultProfile.getVersions().add(version);
-		
-		return defaultProfile;
-	}
-
 	private static final Path getProfilesPath() throws IOException {
 		Path profilesDirectory = Platforms.get().getAppDirectory().resolve("profiles");
 

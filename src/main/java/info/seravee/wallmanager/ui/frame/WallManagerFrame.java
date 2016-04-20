@@ -1,22 +1,25 @@
 package info.seravee.wallmanager.ui.frame;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Image;
-import java.io.File;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
 
-import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 
 import info.seravee.wallcreator.ui.GuiConstants;
 import info.seravee.wallcreator.ui.IconTestPanel;
 import info.seravee.wallcreator.utils.GraphicsUtilities;
 import info.seravee.wallmanager.beans.profile.Profile;
-import info.seravee.wallmanager.business.Services;
-import info.seravee.wallmanager.business.events.EventBusLine;
+import info.seravee.wallmanager.business.worker.WorkerService;
+import info.seravee.wallmanager.ui.ApplicationUI;
 import info.seravee.wallmanager.ui.commons.components.LockableFrame;
 import info.seravee.wallmanager.ui.commons.frame.WMFrame;
 import info.seravee.wallmanager.ui.commons.icons.AppIcon;
@@ -24,52 +27,65 @@ import info.seravee.wallmanager.ui.commons.icons.navigation.GearIcon;
 import info.seravee.wallmanager.ui.commons.icons.navigation.MonitorIcon;
 import info.seravee.wallmanager.ui.commons.icons.navigation.WallpapersIcon;
 import info.seravee.wallmanager.ui.frame.desktop.DesktopEditorPanel;
-import info.seravee.wallmanager.ui.frame.events.ProfileSelectedEvent;
+import info.seravee.wallmanager.ui.frame.desktop.ProfileEditorController;
+import info.seravee.wallmanager.ui.frame.profiles.ProfileListController;
 import info.seravee.wallmanager.ui.frame.profiles.ProfilesListPanel;
-import info.seravee.wallmanager.ui.frame.wallpapers.WallpapersListListener;
+import info.seravee.wallmanager.ui.frame.wallpapers.WallpapersController;
 import info.seravee.wallmanager.ui.frame.wallpapers.WallpapersListPanel;
 
-public class WallManagerFrame implements LockableFrame {
+public class WallManagerFrame extends ApplicationUI implements LockableFrame {
     private final JFrame frame;
     
+    private final ProfileListController profileListController;
     private final ProfilesListPanel profilesListPanel;
 
+    private final ProfileEditorController profileEditorController;
     private final DesktopEditorPanel desktopEditorPanel;
+    
+    private final WallpapersController wallpapersController;
     private final WallpapersListPanel wallpaperListPanel;
     
     private final NavigationPane mainTabbedPane;
-
-    private final ProfileEventSubscriber profileEventSubscriber;
-
-    public WallManagerFrame() {
+    
+    private final JLayeredPane layeredPane;
+    private final LockPanel lockLayer;
+    
+    @Inject
+    private WorkerService workerService;
+    
+    @Inject
+    public WallManagerFrame(ProfileListController profileListcontroller, ProfileEditorController profileEditorController, WallpapersController wallpapersController) {
+    	this.profileListController = profileListcontroller;
+    	this.wallpapersController = wallpapersController;
+    	this.profileEditorController = profileEditorController;
+    	
         frame = new WMFrame("Wall creator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setIconImages(getFrameIcons());
+        frame.addWindowListener(new WindowAdapter() {
+        	@Override
+        	public void windowClosing(WindowEvent e) {
+        		onFrameClose();
+        	}
+		});
         
         profilesListPanel = new ProfilesListPanel();
+        this.profileListController.setPanel(profilesListPanel);
         
         mainTabbedPane = new NavigationPane();
         
         desktopEditorPanel = new DesktopEditorPanel();
+        this.profileEditorController.setPanel(desktopEditorPanel);
         
         wallpaperListPanel = new WallpapersListPanel();
-        wallpaperListPanel.addWallpapersListListener(new WallpapersListListener() {
-			
-			@Override
-			public void wallpaperSelectedForScreen(int screenId, File imageFile) {
-				desktopEditorPanel.wallpaperSelectedForScreen(screenId, imageFile);
-			}
-		});
-
-        buildFrame();
-        frame.pack();
-        frame.setLocationRelativeTo(null);
+        this.wallpapersController.setPanel(wallpaperListPanel);
         
-        profileEventSubscriber = new ProfileEventSubscriber();
-        Services.getEventService().register(EventBusLine.FRAME, profileEventSubscriber);
+        layeredPane = new JLayeredPane();
+        lockLayer = new LockPanel();
     }
-
-    private void buildFrame() {
+    
+    @Override
+    public void build() {
         JComponent contentPane = (JComponent) frame.getContentPane();
         //contentPane.setBorder(GuiConstants.BASE_EMPTY_BORDER);
         contentPane.setLayout(new BorderLayout(0,0));
@@ -77,7 +93,8 @@ public class WallManagerFrame implements LockableFrame {
         
         // Profile selection
         profilesListPanel.buildPanel();
-        contentPane.add(profilesListPanel.getDisplay(), BorderLayout.NORTH);
+        //contentPane.add(profilesListPanel.getDisplay(), BorderLayout.NORTH);
+        layeredPane.add(profilesListPanel.getDisplay(), JLayeredPane.DEFAULT_LAYER + 1);
         
         // --- Navigation
         // Desktop Editor
@@ -91,15 +108,48 @@ public class WallManagerFrame implements LockableFrame {
         mainTabbedPane.addBottomTab(new GearIcon(), "Parameters", new IconTestPanel());
         
         
-        contentPane.add(mainTabbedPane.getDisplay(), BorderLayout.CENTER);
+        //contentPane.add(mainTabbedPane.getDisplay(), BorderLayout.CENTER);
+        layeredPane.add(mainTabbedPane.getDisplay(), JLayeredPane.DEFAULT_LAYER);
+        contentPane.add(layeredPane, BorderLayout.CENTER);
+        
+        
+        Dimension panelSize = new Dimension(mainTabbedPane.getDisplay().getPreferredSize());
+        panelSize.height += profilesListPanel.getDisplay().getPreferredSize().height;
+        
+        layeredPane.setMinimumSize(panelSize);
+        layeredPane.setPreferredSize(panelSize);
+        
+        layeredPane.add(lockLayer, JLayeredPane.MODAL_LAYER);
+        lockLayer.setBounds(0, 0, panelSize.width, panelSize.height);
+        lockLayer.setVisible(false);
+        
+        mainTabbedPane.getDisplay().setBounds(0, profilesListPanel.getDisplay().getPreferredSize().height, mainTabbedPane.getDisplay().getPreferredSize().width, mainTabbedPane.getDisplay().getPreferredSize().height);
+        profilesListPanel.getDisplay().setBounds(0, 0, panelSize.width, profilesListPanel.getDisplay().getPreferredSize().height);
     }
     
     public void setProfiles(List<Profile> profiles) {
     	profilesListPanel.setProfiles(profiles);
     }
-
-    public void show() {
+    
+    @Override
+    public void display() {
+    	workerService.setMainFrame(this);
+    	
+    	wallpapersController.start();
+    	profileEditorController.start();
+    	profileListController.start();
+    	
+    	frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+    
+    protected void onFrameClose() {
+    	workerService.setMainFrame(null);
+    	
+    	profileListController.stop();
+    	profileEditorController.stop();
+    	wallpapersController.stop();
     }
     
     private List<Image> getFrameIcons() {
@@ -114,22 +164,9 @@ public class WallManagerFrame implements LockableFrame {
     	return icons;
     }
     
-    private class ProfileEventSubscriber {
-    	@Subscribe
-    	public void handleSelectedProfileEvent(ProfileSelectedEvent event) {
-    		wallpaperListPanel.setSelectedProfile(event.getProfile());
-    	}
-    }
-    
-    @Override
-    public void lockScreen(boolean lock) {
-    	// TODO Auto-generated method stub
-    	
-    }
-    
     @Override
     public void lockScreen(boolean lock, String message) {
-    	// TODO Auto-generated method stub
-    	
+    	lockLayer.setMessage(message != null ? message : "Default message");
+    	lockLayer.setVisible(lock);
     }
 }

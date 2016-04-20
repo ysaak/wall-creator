@@ -24,12 +24,7 @@ import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
-import info.seravee.wallmanager.business.Services;
-import info.seravee.wallmanager.business.events.EventBusLine;
-import info.seravee.wallmanager.business.workers.StoreProfileWorker;
 import info.seravee.wallmanager.ui.commons.components.JXPanel;
-import info.seravee.wallmanager.ui.frame.events.ProfileSelectedEvent;
-import info.seravee.wallmanager.ui.frame.events.ProfileVersionSelectedEvent;
 
 public final class ProfilesListPanel {
 	private final JXPanel panel;
@@ -42,13 +37,14 @@ public final class ProfilesListPanel {
 	private final DefaultComboBoxModel<ProfileVersion> profilesVersionModel;
 	private final JComboBox<ProfileVersion> profilesVersionList;
 	
-	
 	private final JButton profileRenameButton;
 	
 	private final JButton versionAddButton;
 	private final JButton versionRenameButton; 
 	private final JButton versionSetPreferredButton;
 	private final JButton versionDeleteButton;
+	
+	private ProfileListListener listener = null;
 
 	public ProfilesListPanel() {
 		this.panel = new JXPanel();
@@ -94,9 +90,7 @@ public final class ProfilesListPanel {
 				if (newName != null) {
 					p.setName((String) newName);
 					
-					new StoreProfileWorker(p, null).execute();
-					
-					panel.repaint();
+					fireProfileUpdated(p);
 				}
 			}
 		});
@@ -139,15 +133,10 @@ public final class ProfilesListPanel {
 				final Profile p = getSelectedProfile();
 				final ProfileVersion pv = getSelectedVersion();
 				
-				try {
-					Services.getProfileService().setPreferredVersion(p, pv);
-					
-					
-					versionSetPreferredButton.setEnabled(false);
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				if (listener != null)
+					listener.markProfileVersionAsPrefered(p, pv);
+				
+				versionSetPreferredButton.setEnabled(false);
 			}
 		});
 		
@@ -164,7 +153,7 @@ public final class ProfilesListPanel {
 				if (newName != null) {
 					p.setName((String) newName);
 					
-					new StoreProfileWorker(getSelectedProfile(), null).execute();
+					fireProfileUpdated(getSelectedProfile());
 					
 					panel.repaint();
 				}
@@ -195,7 +184,7 @@ public final class ProfilesListPanel {
 					
 					p.getVersions().add(version);
 					
-					new StoreProfileWorker(p, null).execute();
+					fireProfileUpdated(p);
 					
 					panel.repaint();
 					
@@ -218,7 +207,7 @@ public final class ProfilesListPanel {
 				if (res == JOptionPane.OK_OPTION) {
 					
 					profile.getVersions().remove(version);
-					new StoreProfileWorker(profile, null).execute();
+					fireProfileUpdated(profile);
 					
 					profilesVersionModel.removeElement(version);
 					fireProfileSelected(profile);
@@ -274,16 +263,33 @@ public final class ProfilesListPanel {
 	public ProfileVersion getSelectedVersion() {
 		return (ProfileVersion) profilesVersionList.getSelectedItem();
 	}
+
+	public void addProfile(Profile newProfile) {
+		profilesModel.addElement(newProfile);
+		profilesList.setSelectedItem(newProfile);
+	}
+	
+	public void profileUpdated(Profile profile) {
+		profilesList.repaint();
+		
+		if (getSelectedProfile().equals(profile)) {
+			profilesVersionList.repaint();
+		}
+	}
+	
+	
+	public void removeProfile(Profile profile) {
+		// FIXME
+	}
+	
 	
 	public void setProfiles(List<Profile> profiles) {
 		Profile selectedProfile = null;
 		
-		final String selectedProfileId = Services.getConfigurationService().get().getSelectedProfile();
-		
 		for (Profile p : profiles) {
 			profilesModel.addElement(p);
 			
-			if ((selectedProfileId == null && selectedProfile == null) || p.getId().equals(selectedProfileId)) {
+			if (selectedProfile == null || p.isSelected()) {
 				selectedProfile = p;
 			}
 		}
@@ -297,7 +303,9 @@ public final class ProfilesListPanel {
 	
 	protected void fireProfileSelected(Profile profile) {
 		if (profile != null) {
-			Services.getEventService().post(EventBusLine.FRAME, new ProfileSelectedEvent(profile));
+			
+			if (listener != null)
+				listener.profileSelected(profile);
 			
 			// Fill versions and get the preferred one
 			ProfileVersion preferredVersion = null;
@@ -319,10 +327,19 @@ public final class ProfilesListPanel {
 	
 	protected void fireProfileVersionSelected(ProfileVersion version) {
 		if (version != null) {
-			Services.getEventService().post(EventBusLine.FRAME, new ProfileVersionSelectedEvent(getSelectedProfile(), version));
+			if (listener != null)
+				listener.profileVersionSelected(getSelectedProfile(), version);
 			
 			versionSetPreferredButton.setEnabled(!version.isPreferred());
-			
 		}
+	}
+	
+	protected void fireProfileUpdated(Profile profile) {
+		if (listener != null)
+			listener.profileUpdated(profile);
+	}
+
+	public void setListener(ProfileListListener listener) {
+		this.listener = listener;
 	}
 }

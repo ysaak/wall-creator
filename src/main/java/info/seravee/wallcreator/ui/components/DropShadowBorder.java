@@ -238,7 +238,8 @@ public class DropShadowBorder implements Border, Serializable {
             ConvolveOp blur = new ConvolveOp(new Kernel(shadowSize, shadowSize, blurKernel));
             BufferedImage targetImage = GraphicsUtilities.createCompatibleTranslucentImage(imageWidth, imageWidth);
             ((Graphics2D)targetImage.getGraphics()).drawImage(image, blur, -(shadowSize/2), -(shadowSize/2));
-
+            
+            
             int x = 1;
             int y = 1;
             int w = shadowSize;

@@ -8,11 +8,14 @@ import java.nio.file.Path;
 
 import org.yaml.snakeyaml.Yaml;
 
+import com.google.inject.Singleton;
+
 import info.seravee.wallcreator.platform.Platforms;
 import info.seravee.wallcreator.utils.YamlUtils;
 import info.seravee.wallmanager.beans.Configuration;
 import info.seravee.wallmanager.business.configuration.yaml.ConfigurationConstructor;
 
+@Singleton
 public class ConfigurationManager implements ConfigurationService {
 
 	private Configuration currentConfig = new Configuration();

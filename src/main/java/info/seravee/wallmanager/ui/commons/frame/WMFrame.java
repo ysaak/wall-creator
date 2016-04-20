@@ -26,6 +26,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import info.seravee.wallcreator.ui.components.DropShadowBorder;
 import info.seravee.wallcreator.ui.components.GBCHelper;
 import info.seravee.wallcreator.ui.components.SolarizedColor;
 import info.seravee.wallcreator.ui.components.button.XButton;
@@ -84,8 +85,16 @@ public class WMFrame extends JFrame {
 		}
 		
 		// Frame background
-		contentPane.setBackground(SolarizedColor.BASE03);
-		contentPane.setBorder(BorderFactory.createLineBorder(SolarizedColor.BASE02, 1));
+		//contentPane.setBackground(SolarizedColor.BASE03);
+		setBackground(new Color(0,0,0,0));
+		//contentPane.setBorder(GuiConstants.BASE_EMPTY_BORDER);
+		//contentPane.setBackground(new Color(0,0,0,0));
+		contentPane.setOpaque(false);
+		contentPane.setBorder(new DropShadowBorder(Color.BLACK, 8, .5f, 12, true, true, true, true));
+		
+		JPanel innerContentPane = new JPanel();
+		innerContentPane.setBackground(SolarizedColor.BASE03);
+		innerContentPane.setBorder(BorderFactory.createLineBorder(SolarizedColor.BASE02, 1));
 		
 		appTitleLabel.setFont(appTitleLabel.getFont().deriveFont(Font.BOLD, 13f));
 		appTitleLabel.setForeground(Color.WHITE);
@@ -106,9 +115,12 @@ public class WMFrame extends JFrame {
 
 		
 		// Add the two panels to the content pane
-		contentPane.setLayout(new BorderLayout(5, 5));
-		contentPane.add(topbarPanel, BorderLayout.NORTH);
-		contentPane.add(main, BorderLayout.CENTER);
+		innerContentPane.setLayout(new BorderLayout(5, 5));
+		innerContentPane.add(topbarPanel, BorderLayout.NORTH);
+		innerContentPane.add(main, BorderLayout.CENTER);
+		
+		contentPane.setLayout(new BorderLayout());
+		contentPane.add(innerContentPane, BorderLayout.CENTER);
 
 		// Set position somewhere near the middle of the screen
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

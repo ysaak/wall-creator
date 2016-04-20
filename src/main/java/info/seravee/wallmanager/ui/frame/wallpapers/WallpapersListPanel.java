@@ -10,8 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +18,6 @@ import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -45,12 +42,8 @@ import info.seravee.wallcreator.ui.components.LightScrollPane;
 import info.seravee.wallcreator.ui.components.SolarizedColor;
 import info.seravee.wallcreator.ui.components.button.XButton;
 import info.seravee.wallcreator.ui.components.button.XButtonPosition;
-import info.seravee.wallmanager.beans.Configuration;
-import info.seravee.wallmanager.beans.DialogLastFolderType;
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.Screen;
-import info.seravee.wallmanager.business.Services;
-import info.seravee.wallmanager.business.configuration.ConfigurationException;
 import info.seravee.wallmanager.ui.commons.icons.MinusIcon;
 import info.seravee.wallmanager.ui.commons.icons.PlusIcon;
 import info.seravee.wallmanager.ui.frame.wallpapers.ImageLoadingWorker.LoadingWorkerListener;
@@ -144,11 +137,6 @@ public class WallpapersListPanel {
 
 		addFolderButton = new XButton(new AddDirectoryAction(), XButtonPosition.FIRST);
 		removeFolderButton = new XButton(new RemoveFolderAction(), XButtonPosition.LAST);
-		
-		List<String> folders = Services.getConfigurationService().get().getWallpapersFolders();
-		for(String folder : folders) {
-			folderListModel.addElement(new File(folder));
-		}
 
 		// Worker listener
 		workerListener = new LoadingWorkerListener() {
@@ -163,15 +151,12 @@ public class WallpapersListPanel {
 		listerPanel.setOpaque(false);
 
 		// -- Folder panel
-		
-
 		final JPanel folderPanel = new JPanel(new BorderLayout(0,0));
 		folderPanel.setBackground(Color.WHITE);
 		folderPanel.setBorder(new CompoundBorder(
 				new MatteBorder(0, 0, 0, 1, SolarizedColor.BASE2),
 				new EmptyBorder(0, 0, 0, GuiConstants.BASE_SPACER)
 		));
-		//folderPanel
 		
 		folderLabel.setBorder(new EmptyBorder(GuiConstants.SMALL_SPACER, 0, GuiConstants.SMALL_SPACER, 0));
 		
@@ -253,6 +238,22 @@ public class WallpapersListPanel {
 		}
 	}
 	
+	protected void fireAddFolderEvent() {
+		synchronized (wallpaperListListener) {
+			for (WallpapersListListener l : wallpaperListListener) {
+				l.addFolderEvent(null);
+			}
+		}
+	}
+	
+	protected void fireRemoveFolderEvent(final File folder) {
+		synchronized (wallpaperListListener) {
+			for (WallpapersListListener l : wallpaperListListener) {
+				l.removeFolderEvent(folder);
+			}
+		}
+	}
+	
 	public void addWallpapersListListener(WallpapersListListener l) {
 		synchronized (wallpaperListListener) {
 			wallpaperListListener.add(l);
@@ -263,6 +264,18 @@ public class WallpapersListPanel {
 		synchronized (wallpaperListListener) {
 			wallpaperListListener.remove(l);
 		}
+	}
+
+	public void setFolders(List<String> folders) {
+		folderListModel.removeAllElements();
+		
+		for(String folder : folders) {
+			folderListModel.addElement(new File(folder));
+		}
+	}
+
+	public void addFolder(File folder) {
+		folderListModel.addElement(folder);
 	}
 	
 	private static class ThumbnailView extends JPanel {
@@ -331,38 +344,7 @@ public class WallpapersListPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
-			final Configuration config = Services.getConfigurationService().get();
-			String lastFolder = config.getLastFolders().get(DialogLastFolderType.WALLPAPER_FOLDER);
-
-			JFileChooser chooser = new JFileChooser();
-			if (lastFolder != null && Files.exists(Paths.get(lastFolder))) {
-				chooser.setCurrentDirectory(new File(lastFolder));
-			}
-			chooser.setDialogTitle("Select a folder");
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			chooser.setAcceptAllFileFilterUsed(false);
-
-			if (chooser.showOpenDialog(listerPanel) == JFileChooser.APPROVE_OPTION) {
-				
-				// -- Update configuration
-				// Get parent directory
-				config.getLastFolders().put(DialogLastFolderType.WALLPAPER_FOLDER, chooser.getCurrentDirectory().getAbsolutePath());
-				
-				// Add selected folder
-				config.getWallpapersFolders().add(chooser.getSelectedFile().getAbsolutePath());
-				
-				try {
-					Services.getConfigurationService().store(config);
-				} catch (ConfigurationException e1) {
-					e1.printStackTrace();
-				}
-				
-				folderListModel.addElement(chooser.getSelectedFile());
-				
-			} else {
-				System.out.println("No Selection ");
-			}
+			fireAddFolderEvent();
 		}
 	}
 	
@@ -378,15 +360,9 @@ public class WallpapersListPanel {
 			File selectedValue = folderList.getSelectedValue();
 			if (selectedValue != null) {
 				folderListModel.removeElement(selectedValue);
-
-				final Configuration config = Services.getConfigurationService().get();
-				config.getWallpapersFolders().remove(selectedValue.getAbsolutePath());
+				fireRemoveFolderEvent(selectedValue);
 				
-				try {
-					Services.getConfigurationService().store(config);
-				} catch (ConfigurationException e1) {
-					e1.printStackTrace();
-				}
+				// TODO : vider la liste des images
 			}
 		}
 	}

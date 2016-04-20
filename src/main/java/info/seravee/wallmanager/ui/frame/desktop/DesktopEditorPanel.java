@@ -6,31 +6,21 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.google.common.eventbus.Subscribe;
 
 import info.seravee.utils.SwingUtils;
-import info.seravee.wallcreator.business.workers.RestoreProfileWorker;
 import info.seravee.wallcreator.ui.components.GBCHelper;
 import info.seravee.wallcreator.ui.components.SolarizedColor;
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
-import info.seravee.wallmanager.business.Services;
-import info.seravee.wallmanager.business.events.EventBusLine;
-import info.seravee.wallmanager.business.workers.SaveImageWorker;
-import info.seravee.wallmanager.business.workers.StoreProfileWorker;
-import info.seravee.wallmanager.ui.frame.events.ProfileSelectedEvent;
-import info.seravee.wallmanager.ui.frame.events.ProfileVersionSelectedEvent;
 import info.seravee.wallmanager.ui.frame.events.ScreenSelectedEvent;
 
 public class DesktopEditorPanel {
@@ -39,13 +29,12 @@ public class DesktopEditorPanel {
 	private final ScreensViewPanel screensViewPanel;
 	private final WallpaperParametersPanel parametersPanel;
 	
-	private final JButton saveImageButton;
-	
 	private final JButton saveButton;
 	private final JButton saveAndSetButton;
 	private final JButton cancelButton;
 	
 	private final ScreenListener screenListener;
+	private ProfileEditorListener listener = null;
 	
 	private Profile currentProfile = null;
 	private ProfileVersion currentVersion = null;
@@ -53,34 +42,11 @@ public class DesktopEditorPanel {
 	public DesktopEditorPanel() {
 		desktopPanel = new JPanel();
 		
-		// Screen vies
+		// Screen views
 		screensViewPanel = new ScreensViewPanel();
 		
 		// Parameters
 		parametersPanel = new WallpaperParametersPanel();
-        
-        saveImageButton = new JButton("Save image");
-        saveImageButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                final JFileChooser fc = new JFileChooser();
-                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fc.setAcceptAllFileFilterUsed(false);
-                fc.addChoosableFileFilter(new FileNameExtensionFilter("PNG Image (.png)", "png"));
-
-                int returnVal = fc.showSaveDialog(desktopPanel);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = fc.getSelectedFile();
-                    
-                    if (!file.getName().endsWith(".png")) {
-                        file = new File(file.getAbsolutePath() + ".png");
-                    }
-
-                    new SaveImageWorker(file, currentProfile, currentVersion).execute();
-                }
-            }
-        });
         
         screenListener = new ScreenListener() {
 			
@@ -102,7 +68,9 @@ public class DesktopEditorPanel {
         saveAndSetButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new StoreProfileWorker(currentProfile, currentVersion).execute();
+				if (listener != null) {
+					listener.storeProfile(currentProfile, currentVersion, true);
+				}
 			}
 		});
         
@@ -110,7 +78,9 @@ public class DesktopEditorPanel {
         saveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new StoreProfileWorker(currentProfile, null).execute();
+				if (listener != null) {
+					listener.storeProfile(currentProfile, currentVersion, false);
+				}
 			}
 		});
         
@@ -118,15 +88,10 @@ public class DesktopEditorPanel {
         cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				// FIXME : descendre d'un niveau
-				RestoreProfileWorker worker = new RestoreProfileWorker(currentProfile);
-				worker.execute();
+				if (listener != null)
+					listener.resetProfileVersion(currentProfile, currentVersion);
 			}
 		});
-        
-        
-        Services.getEventService().register(EventBusLine.FRAME, this);
 	}
 	
 	public void buildPanel() {
@@ -139,11 +104,10 @@ public class DesktopEditorPanel {
 		buttonsPanel.setOpaque(false);
 		
 		GBCHelper gbc = new GBCHelper(buttonsPanel);
-		gbc.addAnchoredComponent(saveImageButton, 0, 0, GridBagConstraints.LINE_START);
-		gbc.addComponent(Box.createHorizontalGlue(), 1, 0, 1.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
-		gbc.addAnchoredComponent(saveButton, 2, 0, GridBagConstraints.LINE_START);
-		gbc.addAnchoredComponent(saveAndSetButton, 3, 0, GridBagConstraints.LINE_START);
-		gbc.addAnchoredComponent(cancelButton, 4, 0, GridBagConstraints.LINE_START);
+		gbc.addComponent(Box.createHorizontalGlue(), 0, 0, 1.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
+		gbc.addAnchoredComponent(saveButton, 1, 0, GridBagConstraints.LINE_START);
+		gbc.addAnchoredComponent(saveAndSetButton, 2, 0, GridBagConstraints.LINE_START);
+		gbc.addAnchoredComponent(cancelButton, 3, 0, GridBagConstraints.LINE_START);
 
 		SwingUtils.setSMPSizes(screensViewPanel, new Dimension(screensViewPanel.getPreferredSize().width, 225));
 		
@@ -160,12 +124,11 @@ public class DesktopEditorPanel {
 		return desktopPanel;
 	}
 	
-	@Subscribe
-	public void profileSelected(ProfileSelectedEvent event) {
-		if (event.getProfile().equals(currentProfile))
+	public void profileSelected(Profile profile) {
+		if (profile.equals(currentProfile))
 			return;
 		
-		currentProfile = event.getProfile();
+		currentProfile = profile;
 		
 		// Display configuration
 		screensViewPanel.setScreens(currentProfile.getConfiguration());
@@ -181,17 +144,16 @@ public class DesktopEditorPanel {
 		screensViewPanel.setSelectedScreen(selectedScreen);
 	}
 	
-	@Subscribe
-	public void profileVersionSelected(ProfileVersionSelectedEvent event) {
+	public void profileVersionSelected(Profile profile, ProfileVersion version) {
 		
-		if (!event.getProfile().equals(currentProfile)) {
-			profileSelected(new ProfileSelectedEvent(event.getProfile()));
+		if (!profile.equals(currentProfile)) {
+			profileSelected(profile);
 		}
-		else if (event.getVersion().equals(currentVersion)) {
+		else if (version.equals(currentVersion)) {
 			return;
 		}
 		
-		currentVersion = event.getVersion();
+		currentVersion = version;
 		
 		// Push version to screenview 
 		screensViewPanel.setProfileVersion(currentVersion);
@@ -215,5 +177,9 @@ public class DesktopEditorPanel {
 			
 			screensViewPanel.rebuildScreenImage(screenId);
 		}
+	}
+	
+	public void setListener(ProfileEditorListener listener) {
+		this.listener = listener;
 	}
 }

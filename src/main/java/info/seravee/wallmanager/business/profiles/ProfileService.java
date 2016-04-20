@@ -31,6 +31,15 @@ public interface ProfileService {
 	Profile get(String profileID) throws IOException;
 	
 	
+	/* --- Profiles --- */
+	/**
+	 * Create a new profile with the specified name based on the current configuration
+	 * @param name New profile name
+	 * @return new profile
+	 * @throws ProfileStoreException
+	 */
+	Profile createProfile(String name) throws ProfileStoreException;
+	
 	
 	/* --- Versions --- */
 	

@@ -11,11 +11,14 @@ public class Profile {
 	private List<Screen> configuration;
 	private List<ProfileVersion> versions;
 	
+	private boolean selected;
+	
 	public Profile() {
 		this.id = UUID.randomUUID().toString();
 		this.name = null;
 		this.configuration = new ArrayList<>();
 		this.versions = new ArrayList<>();
+		this.selected = false;
 	}
 	
 	public String getId() {
@@ -52,5 +55,21 @@ public class Profile {
 
 	public void setVersions(List<ProfileVersion> versions) {
 		this.versions = versions;
+	}
+	
+	public boolean isSelected() {
+		return selected;
+	}
+	
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Profile)
+			return this.id.equals(((Profile) obj).getId());
+		
+		return false;
 	}
 }
