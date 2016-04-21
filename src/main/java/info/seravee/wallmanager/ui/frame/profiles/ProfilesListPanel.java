@@ -1,5 +1,7 @@
 package info.seravee.wallmanager.ui.frame.profiles;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -18,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
+import info.seravee.wallcreator.ui.components.DropShadowBorder;
 import info.seravee.wallcreator.ui.components.GBCHelper;
 import info.seravee.wallcreator.ui.components.SolarizedColor;
 import info.seravee.wallmanager.beans.profile.Profile;
@@ -217,9 +220,16 @@ public final class ProfilesListPanel {
 	}
 
 	public void buildPanel() {
-		panel.setBackground(SolarizedColor.BASE03);
+		panel.setBackground(new Color(1f,1f,1f,0f));
 		
-		GBCHelper gbc = new GBCHelper(panel);
+		DropShadowBorder border = new DropShadowBorder(Color.BLACK, 8, .5f, 0, false, false, true, false);
+		border.setFullsizeBottomBorder(true);
+		panel.setBorder(border);
+		
+		final JPanel innerPanel = new JPanel();
+		innerPanel.setBackground(SolarizedColor.BASE03);
+		
+		GBCHelper gbc = new GBCHelper(innerPanel);
 		gbc.addComponent(profileLabel, 0, 0);
 		gbc.addComponent(profilesList, 1, 0, 1.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
 		gbc.addComponent(versionLabel, 2, 0);
@@ -228,6 +238,9 @@ public final class ProfilesListPanel {
 		
 		gbc.addSpanningComponent(buildProfileButtonPanel(), 0, 1, 2, 1);
 		gbc.addSpanningComponent(buildVersionButtonPanel(), 2, 1, 2, 1);
+		
+		panel.setLayout(new BorderLayout());
+		panel.add(innerPanel, BorderLayout.CENTER);
 	}
 	
 	private JPanel buildProfileButtonPanel() {

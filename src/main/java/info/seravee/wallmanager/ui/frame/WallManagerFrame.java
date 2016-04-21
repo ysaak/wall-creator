@@ -114,7 +114,7 @@ public class WallManagerFrame extends ApplicationUI implements LockableFrame {
         
         
         Dimension panelSize = new Dimension(mainTabbedPane.getDisplay().getPreferredSize());
-        panelSize.height += profilesListPanel.getDisplay().getPreferredSize().height;
+        panelSize.height += profilesListPanel.getDisplay().getPreferredSize().height - 8;
         
         layeredPane.setMinimumSize(panelSize);
         layeredPane.setPreferredSize(panelSize);
@@ -123,7 +123,11 @@ public class WallManagerFrame extends ApplicationUI implements LockableFrame {
         lockLayer.setBounds(0, 0, panelSize.width, panelSize.height);
         lockLayer.setVisible(false);
         
-        mainTabbedPane.getDisplay().setBounds(0, profilesListPanel.getDisplay().getPreferredSize().height, mainTabbedPane.getDisplay().getPreferredSize().width, mainTabbedPane.getDisplay().getPreferredSize().height);
+        mainTabbedPane.getDisplay().setBounds(
+        		0, profilesListPanel.getDisplay().getPreferredSize().height - 8, 
+        		mainTabbedPane.getDisplay().getPreferredSize().width, 
+        		mainTabbedPane.getDisplay().getPreferredSize().height
+        );
         profilesListPanel.getDisplay().setBounds(0, 0, panelSize.width, profilesListPanel.getDisplay().getPreferredSize().height);
     }
     

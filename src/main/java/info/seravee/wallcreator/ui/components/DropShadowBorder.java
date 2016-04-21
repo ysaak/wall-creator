@@ -40,6 +40,7 @@ public class DropShadowBorder implements Border, Serializable {
 	private boolean showLeftShadow;
 	private boolean showBottomShadow;
 	private boolean showRightShadow;
+	private boolean fullsizeBottomBorder = false;
 
 	public DropShadowBorder() {
 		this(Color.BLACK, 5);
@@ -108,7 +109,7 @@ public class DropShadowBorder implements Border, Serializable {
 			}
 
 			Point bottomLeftShadowPoint = null;
-			if (showLeftShadow || showBottomShadow) {
+			if ((showLeftShadow || showBottomShadow) && !fullsizeBottomBorder) {
 				bottomLeftShadowPoint = new Point();
 				if (showLeftShadow && !showBottomShadow) {
 					bottomLeftShadowPoint.setLocation(x, y + height - shadowSize - shadowSize);
@@ -118,9 +119,12 @@ public class DropShadowBorder implements Border, Serializable {
 					bottomLeftShadowPoint.setLocation(x + shadowSize, y + height - shadowSize);
 				}
 			}
+			else {
+				bottomLeftShadowPoint = new Point(x - shadowSize, y + height - shadowSize);
+			}
 
 			Point bottomRightShadowPoint = null;
-			if (showRightShadow || showBottomShadow) {
+			if ((showRightShadow || showBottomShadow) && !fullsizeBottomBorder) {
 				bottomRightShadowPoint = new Point();
 				if (showRightShadow && !showBottomShadow) {
 					bottomRightShadowPoint.setLocation(x + width - shadowSize, y + height - shadowSize - shadowSize);
@@ -129,6 +133,9 @@ public class DropShadowBorder implements Border, Serializable {
 				} else if (!showRightShadow && showBottomShadow) {
 					bottomRightShadowPoint.setLocation(x + width - shadowSize - shadowSize, y + height - shadowSize);
 				}
+			}
+			else {
+				bottomRightShadowPoint = new Point(x + width, y + height - shadowSize);
 			}
 
 			Point topRightShadowPoint = null;
@@ -346,6 +353,10 @@ public class DropShadowBorder implements Border, Serializable {
         return showBottomShadow;
     }
     
+    public boolean isFullsizeBottomBorder() {
+		return fullsizeBottomBorder;
+	}
+    
     public int getShadowSize() {
         return shadowSize;
     }
@@ -393,4 +404,8 @@ public class DropShadowBorder implements Border, Serializable {
     public void setShowRightShadow(boolean showRightShadow) {
         this.showRightShadow = showRightShadow;
     }
+    
+    public void setFullsizeBottomBorder(boolean fullsizeBottomBorder) {
+		this.fullsizeBottomBorder = fullsizeBottomBorder;
+	}
 }

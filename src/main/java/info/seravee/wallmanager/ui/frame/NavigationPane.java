@@ -31,6 +31,7 @@ import javax.swing.border.EmptyBorder;
 
 import info.seravee.wallcreator.ui.GuiConstants;
 import info.seravee.wallcreator.ui.components.GBCHelper;
+import info.seravee.wallcreator.ui.components.SolarizedColor;
 import info.seravee.wallmanager.ui.commons.icons.navigation.NavigationIcon;
 
 class NavigationPane {
@@ -60,7 +61,8 @@ class NavigationPane {
 
 	public NavigationPane() {
 		mainPanel = new JPanel(new BorderLayout());
-		mainPanel.setOpaque(false);
+		//mainPanel.setOpaque(false);
+		mainPanel.setBackground(SolarizedColor.BASE02);
 
 		buttonsPanel = new JPanel(new BorderLayout(GuiConstants.BASE_SPACER, 0));
 		buttonsPanel.setOpaque(false);
