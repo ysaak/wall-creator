@@ -2,6 +2,7 @@ package info.seravee.wallmanager.ui.frame.wallpapers;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseEvent;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -29,6 +30,36 @@ public class FolderList<T> extends JList<T> {
 
 		this.setSelectionBackground(SolarizedColor.BLUE);
 		this.setSelectionForeground(Color.WHITE);
+	}
+	
+	private boolean processEvent(MouseEvent e) {
+        int index = locationToIndex(e.getPoint());
+        return index > -1 && getCellBounds(index, index).contains(e.getPoint());
+    }
+	
+	@Override
+	protected void processMouseEvent(MouseEvent e) {
+		if (processEvent(e)) {
+			super.processMouseEvent(e);
+		}
+		
+		if (e.getID() == MouseEvent.MOUSE_EXITED) {
+			hoveredIndex = -1;
+			repaint();
+		}
+	}
+	
+	@Override
+	protected void processMouseMotionEvent(MouseEvent e) {
+		if (processEvent(e)) {
+			super.processMouseMotionEvent(e);
+			
+			hoveredIndex = locationToIndex(e.getPoint());
+		}
+		else {
+			hoveredIndex = -1;
+		}
+		repaint();
 	}
 
 	private class FolderListCellRendered extends DefaultListCellRenderer {
