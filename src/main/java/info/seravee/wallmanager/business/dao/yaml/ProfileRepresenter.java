@@ -1,4 +1,4 @@
-package info.seravee.wallmanager.business.profiles.yaml;
+package info.seravee.wallmanager.business.dao.yaml;
 
 import java.awt.Color;
 

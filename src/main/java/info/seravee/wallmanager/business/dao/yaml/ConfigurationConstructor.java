@@ -1,4 +1,4 @@
-package info.seravee.wallmanager.business.configuration.yaml;
+package info.seravee.wallmanager.business.dao.yaml;
 
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.constructor.Constructor;

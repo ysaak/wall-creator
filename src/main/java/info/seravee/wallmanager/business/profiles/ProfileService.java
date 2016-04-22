@@ -5,6 +5,7 @@ import java.util.List;
 
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
+import info.seravee.wallmanager.business.exception.NoDataFoundException;
 import info.seravee.wallmanager.business.exception.profile.ProfileStoreException;
 
 public interface ProfileService {
@@ -18,17 +19,18 @@ public interface ProfileService {
 	/**
 	 * Store a profile
 	 * @param profile
+	 * @return 
 	 * @throws ProfileStoreException 
 	 */
-	void store(Profile profile) throws ProfileStoreException;
+	Profile store(Profile profile) throws ProfileStoreException;
 	
 	/**
 	 * 
 	 * @param profileID
 	 * @return
-	 * @throws IOException
+	 * @throws NoDataFoundException
 	 */
-	Profile get(String profileID) throws IOException;
+	Profile get(String profileID) throws NoDataFoundException;
 	
 	
 	/* --- Profiles --- */
@@ -44,6 +46,4 @@ public interface ProfileService {
 	/* --- Versions --- */
 	
 	Profile deleteVersion(Profile profile, ProfileVersion versionToDelete) throws IOException;
-	
-	Profile setPreferredVersion(Profile profile, ProfileVersion preferredVersion) throws IOException, ProfileStoreException;
 }
