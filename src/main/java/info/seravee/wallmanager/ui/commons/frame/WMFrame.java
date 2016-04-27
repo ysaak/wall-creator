@@ -93,16 +93,16 @@ public class WMFrame extends JFrame {
 		contentPane.setBorder(new DropShadowBorder(Color.BLACK, 8, .5f, 12, true, true, true, true));
 		
 		JPanel innerContentPane = new JPanel();
-		innerContentPane.setBackground(SolarizedColor.BASE03);
+		innerContentPane.setBackground(Color.BLACK);
 		innerContentPane.setBorder(BorderFactory.createLineBorder(SolarizedColor.BASE02, 1));
 		
 		appTitleLabel.setFont(appTitleLabel.getFont().deriveFont(Font.BOLD, 13f));
 		appTitleLabel.setForeground(Color.WHITE);
 
 		// close "button" - show this image by default
-		minimizeButton = new XButton(new MinimizeFrameAction(), new XButtonColor(SolarizedColor.BASE03, SolarizedColor.BASE02, SolarizedColor.BASE02.darker(), Color.WHITE), XButtonPosition.MIDDLE);
+		minimizeButton = new XButton(new MinimizeFrameAction(), new XButtonColor(Color.BLACK, SolarizedColor.BASE02, SolarizedColor.BASE02.darker(), Color.WHITE), XButtonPosition.MIDDLE);
 		minimizeButton.setIconTextGap(0);
-		closeButton = new XButton(new CloseFrameAction(), new XButtonColor(SolarizedColor.BASE03, SolarizedColor.RED, SolarizedColor.RED.darker(), Color.WHITE), XButtonPosition.MIDDLE);
+		closeButton = new XButton(new CloseFrameAction(), new XButtonColor(Color.BLACK, SolarizedColor.RED, SolarizedColor.RED.darker(), Color.WHITE), XButtonPosition.MIDDLE);
 		closeButton.setIconTextGap(0);
 		
 		// Build top bar

@@ -94,7 +94,9 @@ public class WallManagerFrame extends ApplicationUI implements LockableFrame {
         // Profile selection
         profilesListPanel.buildPanel();
         //contentPane.add(profilesListPanel.getDisplay(), BorderLayout.NORTH);
-        layeredPane.add(profilesListPanel.getDisplay(), JLayeredPane.DEFAULT_LAYER + 1);
+        layeredPane.add(profilesListPanel.getDisplay(), JLayeredPane.PALETTE_LAYER + 8);
+        layeredPane.add(profilesListPanel.getActionsPanel(), JLayeredPane.PALETTE_LAYER + 4);
+        layeredPane.add(profilesListPanel.getOverlayPanel(), JLayeredPane.PALETTE_LAYER);
         
         // --- Navigation
         // Desktop Editor
@@ -113,8 +115,12 @@ public class WallManagerFrame extends ApplicationUI implements LockableFrame {
         contentPane.add(layeredPane, BorderLayout.CENTER);
         
         
+        final int topbarHeight = 50;
+        final int topbarShadowSize = 8;
+        
+        
         Dimension panelSize = new Dimension(mainTabbedPane.getDisplay().getPreferredSize());
-        panelSize.height += profilesListPanel.getDisplay().getPreferredSize().height - 8;
+        panelSize.height += topbarHeight - topbarShadowSize;
         
         layeredPane.setMinimumSize(panelSize);
         layeredPane.setPreferredSize(panelSize);
@@ -124,11 +130,20 @@ public class WallManagerFrame extends ApplicationUI implements LockableFrame {
         lockLayer.setVisible(false);
         
         mainTabbedPane.getDisplay().setBounds(
-        		0, profilesListPanel.getDisplay().getPreferredSize().height - 8, 
+        		0, topbarHeight - topbarShadowSize, 
         		mainTabbedPane.getDisplay().getPreferredSize().width, 
         		mainTabbedPane.getDisplay().getPreferredSize().height
         );
-        profilesListPanel.getDisplay().setBounds(0, 0, panelSize.width, profilesListPanel.getDisplay().getPreferredSize().height);
+        
+        
+        profilesListPanel.getDisplay().setBounds(0, 0, 
+        		panelSize.width, topbarHeight);
+        
+        profilesListPanel.getActionsPanel().setBounds(0, - topbarShadowSize,
+        		panelSize.width, topbarHeight);
+        
+        profilesListPanel.getOverlayPanel().setBounds(0, topbarHeight - topbarShadowSize,
+        		panelSize.width, panelSize.height);
     }
     
     public void setProfiles(List<Profile> profiles) {

@@ -4,9 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,23 +18,25 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.Timer;
 
 import info.seravee.wallcreator.ui.components.DropShadowBorder;
 import info.seravee.wallcreator.ui.components.GBCHelper;
-import info.seravee.wallcreator.ui.components.SolarizedColor;
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
-import info.seravee.wallmanager.ui.commons.components.JXPanel;
 
 public final class ProfilesListPanel {
-	private final JXPanel panel;
+	private final JPanel panel;
+	private final JPanel actionsPanel;
+	private final JComponent overlayPanel;
 
 	private final JLabel profileLabel;
 	private final DefaultComboBoxModel<Profile> profilesModel;
@@ -48,12 +54,26 @@ public final class ProfilesListPanel {
 	private final JButton versionDeleteButton;
 	
 	private ProfileListListener listener = null;
+	
+	
+	private boolean actionsPanelVisible = false;
+	private Timer slideTimer = null;
+	
+	private static final int SLIDE_INCREMENT = 10;
+	private static final int SLIDE_EVENT_INTERVAL = 50;
+	
+	private final JButton tstButton = new JButton("open");
 
 	public ProfilesListPanel() {
-		this.panel = new JXPanel();
+		this.panel = new JPanel();
+		this.actionsPanel = new JPanel();
+		this.overlayPanel = new JPanel();
+		overlayPanel.setVisible(false);
 
 		// Profiles list
 		profileLabel = new JLabel("Profile");
+		profileLabel.setForeground(Color.WHITE);
+		profileLabel.setFont(profileLabel.getFont().deriveFont(Font.BOLD));
 		
 		profilesModel = new DefaultComboBoxModel<>();
 		profilesList = new JComboBox<>(profilesModel);
@@ -102,9 +122,12 @@ public final class ProfilesListPanel {
 
 		// Profile's versions
 		versionLabel = new JLabel("Version");
+		versionLabel.setForeground(Color.WHITE);
+		versionLabel.setFont(profileLabel.getFont().deriveFont(Font.BOLD));
 		
 		profilesVersionModel = new DefaultComboBoxModel<>();
 		profilesVersionList = new JComboBox<>(profilesVersionModel);
+		profilesVersionList.setLightWeightPopupEnabled(false);
 		profilesVersionList.setRenderer(new DefaultListCellRenderer() {
 			private static final long serialVersionUID = -4083147274728881969L;
 
@@ -217,30 +240,106 @@ public final class ProfilesListPanel {
 				}
 			}
 		});
+		
+		tstButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showActionsPanel();
+			}
+		});
+	}
+	
+	private void showActionsPanel() {
+		stopSlideTimer();
+		
+		actionsPanelVisible = !actionsPanelVisible;
+		
+		slideTimer = new Timer(SLIDE_EVENT_INTERVAL, new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				slideActionPanel();
+			}
+		});
+		
+		slideTimer.start();
+	}
+	
+	private void slideActionPanel() {
+		
+		Rectangle oldBounds = actionsPanel.getBounds();
+		oldBounds.y += (actionsPanelVisible ? 1 : -1) * SLIDE_INCREMENT;
+		actionsPanel.setBounds(oldBounds);
+		
+		Rectangle overlayBounds = overlayPanel.getBounds();
+		overlayBounds.y += (actionsPanelVisible ? 1 : -1) * SLIDE_INCREMENT;
+		overlayPanel.setBounds(overlayBounds);
+		
+		// Overlay opacity
+		int rasY = overlayBounds.y + 8; // 0 - 50
+		float opacity = (rasY - 50) / 100f;
+		overlayPanel.setBackground(new Color(0,0,0, opacity));
+		
+		if (oldBounds.y == 42 || oldBounds.y == -8) {
+			stopSlideTimer();
+		}
+		
+		if (oldBounds.y == -8) {
+			overlayPanel.setVisible(false);
+		}
+		else if (!overlayPanel.isVisible()) {
+			overlayPanel.setVisible(true);
+		}
+	}
+	
+	private void stopSlideTimer() {
+		if (slideTimer != null) {
+			slideTimer.stop();
+			slideTimer = null;
+		}
 	}
 
 	public void buildPanel() {
-		panel.setBackground(new Color(1f,1f,1f,0f));
+		final JPanel listPanel = buildListPanel();
+		buildActionsPanel();
 		
-		DropShadowBorder border = new DropShadowBorder(Color.BLACK, 8, .5f, 0, false, false, true, false);
-		border.setFullsizeBottomBorder(true);
-		panel.setBorder(border);
+		
+		createBorderedPanel(panel, listPanel);
+		//createBorderedPanel(this.actionsPanel, actionsPanel);
+	}
+	
+	private JPanel buildListPanel() {
+		// https://github.com/JTWalraven/macwidgets/tree/master/src/main/java/com/jtechdev/macwidgets/plaf
 		
 		final JPanel innerPanel = new JPanel();
-		innerPanel.setBackground(SolarizedColor.BASE03);
+		innerPanel.setBackground(Color.BLACK);
 		
 		GBCHelper gbc = new GBCHelper(innerPanel);
 		gbc.addComponent(profileLabel, 0, 0);
 		gbc.addComponent(profilesList, 1, 0, 1.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
 		gbc.addComponent(versionLabel, 2, 0);
 		gbc.addComponent(profilesVersionList, 3, 0, 1.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
+		gbc.addComponent(tstButton, 4, 0);
+
+		return innerPanel;
+	}
+	
+	private void buildActionsPanel() {
+		overlayPanel.setBackground(new Color(0,0,0, 0.5f));
+		overlayPanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				showActionsPanel();
+			}
+		});
 		
+		actionsPanel.setBackground(Color.DARK_GRAY.darker().darker());
+		
+		GBCHelper gbc = new GBCHelper(actionsPanel);
 		
 		gbc.addSpanningComponent(buildProfileButtonPanel(), 0, 1, 2, 1);
 		gbc.addSpanningComponent(buildVersionButtonPanel(), 2, 1, 2, 1);
-		
-		panel.setLayout(new BorderLayout());
-		panel.add(innerPanel, BorderLayout.CENTER);
 	}
 	
 	private JPanel buildProfileButtonPanel() {
@@ -265,8 +364,27 @@ public final class ProfilesListPanel {
 		return buttonsPanel;
 	}
 
+	private void createBorderedPanel(final JPanel container, final JPanel innerPanel) {
+		container.setBackground(new Color(1f,1f,1f,0f));
+		
+		DropShadowBorder border = new DropShadowBorder(Color.BLACK, 8, .5f, 0, false, false, true, false);
+		border.setFullsizeBottomBorder(true);
+		container.setBorder(border);
+		
+		container.setLayout(new BorderLayout());
+		container.add(innerPanel, BorderLayout.CENTER);
+	}
+	
 	public JPanel getDisplay() {
 		return panel;
+	}
+	
+	public JPanel getActionsPanel() {
+		return actionsPanel;
+	}
+	
+	public JComponent getOverlayPanel() {
+		return overlayPanel;
 	}
 	
 	public Profile getSelectedProfile() {
