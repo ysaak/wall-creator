@@ -32,6 +32,7 @@ import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
+import info.seravee.wallmanager.ui.commons.I18N;
 
 public final class ProfilesListPanel {
 	private final JPanel panel;
@@ -72,7 +73,7 @@ public final class ProfilesListPanel {
 		overlayPanel.setVisible(false);
 
 		// Profiles list
-		profileLabel = new JLabel("Profile");
+		profileLabel = new JLabel(I18N.get("ProfilePanel.profile"));
 		profileLabel.setForeground(Color.WHITE);
 		profileLabel.setFont(profileLabel.getFont().deriveFont(Font.BOLD));
 		
@@ -101,7 +102,7 @@ public final class ProfilesListPanel {
 			}
 		});
 		
-		profileCreateButton = new JButton("New profile");
+		profileCreateButton = new JButton(I18N.get("ProfilePanel.profile.create"));
 		profileCreateButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -112,7 +113,7 @@ public final class ProfilesListPanel {
 			}
 		});
 		
-		profileRenameButton = new JButton("Rename");
+		profileRenameButton = new JButton(I18N.get("ProfilePanel.profile.rename"));
 		profileRenameButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -133,7 +134,7 @@ public final class ProfilesListPanel {
 		/* --------------------------------------------------------------------- */
 
 		// Profile's versions
-		versionLabel = new JLabel("Version");
+		versionLabel = new JLabel(I18N.get("ProfilePanel.version"));
 		versionLabel.setForeground(Color.WHITE);
 		versionLabel.setFont(profileLabel.getFont().deriveFont(Font.BOLD));
 		
