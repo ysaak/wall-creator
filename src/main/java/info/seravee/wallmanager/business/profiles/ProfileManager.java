@@ -13,6 +13,7 @@ import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
 import info.seravee.wallmanager.business.dao.ProfileDao;
 import info.seravee.wallmanager.business.exception.NoDataFoundException;
+import info.seravee.wallmanager.business.exception.profile.NameAlreadyUsedException;
 
 public class ProfileManager implements ProfileService {
 
@@ -25,8 +26,13 @@ public class ProfileManager implements ProfileService {
 
 		if (profiles.size() == 0) {
 			// No profile defined, create a default one
-			Profile defaultProfile = createProfile("Default");
-			profiles.add(defaultProfile);
+			final Profile defaultProfile;
+			try {
+				defaultProfile = createProfile("Default");
+				profiles.add(defaultProfile);
+			} catch (NameAlreadyUsedException e) {
+				// Should not append since no profile exists
+			}
 		}
 		
 		return profiles;
@@ -44,7 +50,16 @@ public class ProfileManager implements ProfileService {
 	/* --- Profile's actions --- */
 	
 	@Override
-	public Profile createProfile(String name/*, List<Screen> desktopConfiguration*/) {
+	public Profile createProfile(String name/*, List<Screen> desktopConfiguration*/) throws NameAlreadyUsedException {
+		
+		// Check for profile name unicity
+		List<Profile> existingProfiles = profileDao.list();
+		for (Profile p : existingProfiles) {
+			if (p.getName().equalsIgnoreCase(name)) {
+				throw new NameAlreadyUsedException("The name '" + name + "' is already used");
+			}
+		}
+		
 		Profile profile = new Profile();
 		profile.setName(name);
 		profile.setConfiguration(Platforms.get().getDesktopConfiguration());

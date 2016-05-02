@@ -46,6 +46,7 @@ public final class ProfilesListPanel {
 	private final DefaultComboBoxModel<ProfileVersion> profilesVersionModel;
 	private final JComboBox<ProfileVersion> profilesVersionList;
 	
+	private final JButton profileCreateButton;
 	private final JButton profileRenameButton;
 	
 	private final JButton versionAddButton;
@@ -97,6 +98,17 @@ public final class ProfilesListPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				fireProfileSelected((Profile) profilesList.getSelectedItem());
+			}
+		});
+		
+		profileCreateButton = new JButton("New profile");
+		profileCreateButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String name = (String) JOptionPane.showInputDialog(panel, "New name", "Rename profile", JOptionPane.QUESTION_MESSAGE, null, null, null);
+				
+				fireProfileCreate(name);
 			}
 		});
 		
@@ -304,9 +316,7 @@ public final class ProfilesListPanel {
 		final JPanel listPanel = buildListPanel();
 		buildActionsPanel();
 		
-		
 		createBorderedPanel(panel, listPanel);
-		//createBorderedPanel(this.actionsPanel, actionsPanel);
 	}
 	
 	private JPanel buildListPanel() {
@@ -338,14 +348,15 @@ public final class ProfilesListPanel {
 		
 		GBCHelper gbc = new GBCHelper(actionsPanel);
 		
-		gbc.addSpanningComponent(buildProfileButtonPanel(), 0, 1, 2, 1);
-		gbc.addSpanningComponent(buildVersionButtonPanel(), 2, 1, 2, 1);
+		gbc.addComponent(buildProfileButtonPanel(), 0, 0, 2.0, 0.0, 1, 1, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL);
+		gbc.addComponent(buildVersionButtonPanel(), 1, 0, 1.0, 0.0, 1, 1, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL);
 	}
 	
 	private JPanel buildProfileButtonPanel() {
 		JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		buttonsPanel.setOpaque(false);
 		
+		buttonsPanel.add(profileCreateButton);
 		buttonsPanel.add(profileRenameButton);
 		
 		return buttonsPanel;
@@ -463,6 +474,11 @@ public final class ProfilesListPanel {
 			
 			versionSetPreferredButton.setEnabled(!version.isPreferred());
 		}
+	}
+	
+	protected void fireProfileCreate(String name) {
+		if (listener != null)
+			listener.profileCreate(name);
 	}
 	
 	protected void fireProfileUpdated(Profile profile) {

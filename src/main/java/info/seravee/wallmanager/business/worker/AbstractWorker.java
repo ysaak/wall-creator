@@ -1,6 +1,11 @@
 package info.seravee.wallmanager.business.worker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractWorker<T> {
+	
+	protected static final Logger LOG = LoggerFactory.getLogger(AbstractWorker.class);
 	
 	private boolean lockMainScreen = false;
 	private String message = null;
@@ -11,6 +16,7 @@ public abstract class AbstractWorker<T> {
 	
 	public void error(Throwable error) {
 		// Override to use
+		LOG.error("Error while excuting worker", error);
 	}
 	
 	public void withMessage(String message) {
