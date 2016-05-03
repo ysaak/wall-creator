@@ -1,4 +1,4 @@
-package info.seravee.data;
+package info.seravee.wallmanager.beans;
 
 /**
  * Created by ysaak on 27/01/15.

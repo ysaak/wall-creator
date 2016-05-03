@@ -3,7 +3,7 @@ package info.seravee.wallmanager.beans.profile;
 import java.awt.Color;
 
 import info.seravee.DefaultConfiguration;
-import info.seravee.data.ScalingAlgorithm;
+import info.seravee.wallmanager.beans.ScalingAlgorithm;
 
 public class WallpaperParameters {
 	private int screenId;

@@ -1,6 +1,7 @@
 package info.seravee.wallmanager.ui.frame.desktop;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
@@ -12,25 +13,28 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.text.JTextComponent;
 
 import info.seravee.DefaultConfiguration;
 import info.seravee.business.files.ImageFilter;
-import info.seravee.data.ScalingAlgorithm;
 import info.seravee.utils.SwingUtils;
 import info.seravee.wallcreator.ui.GuiConstants;
 import info.seravee.wallcreator.ui.components.ComponentFactory;
 import info.seravee.wallcreator.ui.components.GBCHelper;
 import info.seravee.wallcreator.ui.components.SolarizedColor;
+import info.seravee.wallmanager.beans.ScalingAlgorithm;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
+import info.seravee.wallmanager.ui.commons.I18N;
 
 public class WallpaperParametersPanel {
 	
@@ -57,12 +61,12 @@ public class WallpaperParametersPanel {
     	
         mainPanel = new JPanel();
 
-        imageLabel = new JLabel("Image:", SwingConstants.TRAILING);
-        sizeLabel = new JLabel("Size:", SwingConstants.TRAILING);
-        colorLabel = new JLabel("Color:", SwingConstants.TRAILING);
+        imageLabel = new JLabel(I18N.get("WallpaperParameters.image"), SwingConstants.TRAILING);
+        sizeLabel = new JLabel(I18N.get("WallpaperParameters.size"), SwingConstants.TRAILING);
+        colorLabel = new JLabel(I18N.get("WallpaperParameters.color"), SwingConstants.TRAILING);
         
         imageField = ComponentFactory.createEditorPane();
-        imageField.setText("rerzerzerzerzer");
+        imageField.setText(" ");
         imageField.setEditable(false);
         imageField.addMouseListener(new MouseAdapter() {
             @Override
@@ -73,7 +77,7 @@ public class WallpaperParametersPanel {
             }
         });
 
-        chooseFileButton = new JButton("Select image");
+        chooseFileButton = new JButton(I18N.get("WallpaperParameters.select.image"));
         chooseFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -91,7 +95,7 @@ public class WallpaperParametersPanel {
                 }
             }
         });
-        clearButton = new JButton("Clear");
+        clearButton = new JButton(I18N.get("WallpaperParameters.clear"));
         clearButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -102,6 +106,15 @@ public class WallpaperParametersPanel {
 		});
 
         scalingAlgoField = new JComboBox<>(ScalingAlgorithm.values());
+        scalingAlgoField.setRenderer(new DefaultListCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+        	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        		ScalingAlgorithm algo = (ScalingAlgorithm) value;
+        		return super.getListCellRendererComponent(list, I18N.get(algo), index, isSelected, cellHasFocus);
+        	}
+        });
         scalingAlgoField.setSelectedIndex(ScalingAlgorithm.indexOf(DefaultConfiguration.SCALING_ALGORITHM));
         scalingAlgoField.addActionListener(new ActionListener() {
             @Override
@@ -124,11 +137,11 @@ public class WallpaperParametersPanel {
             }
         });
         
-        colorChooserButton = new JButton("Select color");
+        colorChooserButton = new JButton(I18N.get("WallpaperParameters.select.color"));
         colorChooserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Color c = JColorChooser.showDialog(null, "Choose a Color", colorDisplayLabel.getBackground());
+                Color c = JColorChooser.showDialog(null, I18N.get("WallpaperParameters.select.color"), colorDisplayLabel.getBackground());
                 
                 if (c != null) {
                 	parameters.setBackgroundColor(c);

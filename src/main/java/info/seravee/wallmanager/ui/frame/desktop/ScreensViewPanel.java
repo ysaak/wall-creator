@@ -15,8 +15,8 @@ import java.util.Set;
 
 import javax.swing.JComponent;
 
-import info.seravee.data.ScalingAlgorithm;
 import info.seravee.utils.ImageScalerUtils;
+import info.seravee.wallmanager.beans.ScalingAlgorithm;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.ui.frame.desktop.ScreenListener.ScreenAdapter;

@@ -32,6 +32,14 @@ public class I18N {
 	public static String get(boolean boolVal) {
 		return get(boolVal ? YES_STRING_TRANSLATION : NO_STRING_TRANSLATION);
 	}
+	
+	public static String get(Enum<?> enumVal) {
+		if (enumVal == null) {
+			return null;
+		}
+		String translationKey = enumVal.getClass().getName() + "." + enumVal.toString();
+		return get(translationKey);
+	}
 
 	public static String get(String strName) {
 		return get(strName, true);

@@ -12,8 +12,6 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import com.google.common.eventbus.Subscribe;
-
 import info.seravee.utils.SwingUtils;
 import info.seravee.wallcreator.ui.components.GBCHelper;
 import info.seravee.wallcreator.ui.components.SolarizedColor;
@@ -21,7 +19,7 @@ import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
-import info.seravee.wallmanager.ui.frame.events.ScreenSelectedEvent;
+import info.seravee.wallmanager.ui.commons.I18N;
 
 public class DesktopEditorPanel {
 	private final JPanel desktopPanel;
@@ -52,7 +50,7 @@ public class DesktopEditorPanel {
 			
 			@Override
 			public void screenSelected(Screen screen) {
-				//handleScreenSelected(screen);
+				DesktopEditorPanel.this.screenSelected(screen);
 			}
 			
 			@Override
@@ -64,7 +62,7 @@ public class DesktopEditorPanel {
         parametersPanel.addScreenListener(screenListener);
 		
         // Buttons
-        saveAndSetButton = new JButton("Save and set");
+        saveAndSetButton = new JButton(I18N.get("ProfileVersionEditor.saveSet"));
         saveAndSetButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -74,7 +72,7 @@ public class DesktopEditorPanel {
 			}
 		});
         
-        saveButton = new JButton("Save");
+        saveButton = new JButton(I18N.get("ProfileVersionEditor.save"));
         saveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -84,7 +82,7 @@ public class DesktopEditorPanel {
 			}
 		});
         
-        cancelButton = new JButton("Cancel");
+        cancelButton = new JButton(I18N.get("ProfileVersionEditor.cancel"));
         cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -160,13 +158,12 @@ public class DesktopEditorPanel {
 		
 		// Update parameter field with currently selected panel
 		final Screen selectedScreen = screensViewPanel.getSelectedScreen();
-		parametersPanel.setCurrentScreen(currentVersion.getScreenParameters(selectedScreen.getId()));
+		screenSelected(selectedScreen);
 	}
 	
-	@Subscribe
-	public void screenSelected(ScreenSelectedEvent event) {
+	protected void screenSelected(Screen screen) {
 		if (currentVersion != null) {
-			parametersPanel.setCurrentScreen(currentVersion.getScreenParameters(event.getScreen().getId()));
+			parametersPanel.setCurrentScreen(currentVersion.getScreenParameters(screen.getId()));
 		}
 	}
 	

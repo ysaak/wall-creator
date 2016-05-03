@@ -6,7 +6,7 @@ import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
-import info.seravee.data.ScalingAlgorithm;
+import info.seravee.wallmanager.beans.ScalingAlgorithm;
 
 /**
  * Created by ysaak on 27/01/15.

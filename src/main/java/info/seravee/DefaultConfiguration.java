@@ -1,8 +1,8 @@
 package info.seravee;
 
-import info.seravee.data.ScalingAlgorithm;
-
 import java.awt.*;
+
+import info.seravee.wallmanager.beans.ScalingAlgorithm;
 
 /**
  * Created by ysaak on 02/02/15.
