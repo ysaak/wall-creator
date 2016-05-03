@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -33,6 +34,8 @@ import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
 import info.seravee.wallmanager.ui.commons.I18N;
+import info.seravee.wallmanager.ui.commons.components.buttons.CircleButton;
+import info.seravee.wallmanager.ui.commons.icons.MoreIcon;
 
 public final class ProfilesListPanel {
 	private final JPanel panel;
@@ -64,14 +67,14 @@ public final class ProfilesListPanel {
 	private static final int SLIDE_INCREMENT = 10;
 	private static final int SLIDE_EVENT_INTERVAL = 50;
 	
-	private final JButton tstButton = new JButton("open");
+	private final JButton showActionsButton;
 
 	public ProfilesListPanel() {
 		this.panel = new JPanel();
 		this.actionsPanel = new JPanel();
 		this.overlayPanel = new JPanel();
 		overlayPanel.setVisible(false);
-
+		
 		// Profiles list
 		profileLabel = new JLabel(I18N.get("ProfilePanel.profile"));
 		profileLabel.setForeground(Color.WHITE);
@@ -254,13 +257,15 @@ public final class ProfilesListPanel {
 			}
 		});
 		
-		tstButton.addActionListener(new ActionListener() {
-			
+		showActionsButton = new CircleButton(new AbstractAction("", new MoreIcon(20)) {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				showActionsPanel();
 			}
 		});
+		showActionsButton.setBackground(new Color(0,0,0,0));
 	}
 	
 	private void showActionsPanel() {
@@ -331,7 +336,7 @@ public final class ProfilesListPanel {
 		gbc.addComponent(profilesList, 1, 0, 1.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
 		gbc.addComponent(versionLabel, 2, 0);
 		gbc.addComponent(profilesVersionList, 3, 0, 1.0, 0.0, 1, 1, GBCHelper.DEFAULT_ANCHOR, GridBagConstraints.HORIZONTAL);
-		gbc.addComponent(tstButton, 4, 0);
+		gbc.addComponent(showActionsButton, 4, 0);
 
 		return innerPanel;
 	}
