@@ -11,12 +11,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 
-import info.seravee.wallcreator.platform.Platforms;
 import info.seravee.wallcreator.utils.GraphicsUtilities;
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.business.events.EventBusLine;
 import info.seravee.wallmanager.business.events.EventService;
+import info.seravee.wallmanager.business.platform.PlatformService;
 import info.seravee.wallmanager.business.profiles.ProfileService;
 import info.seravee.wallmanager.business.worker.AbstractWorker;
 import info.seravee.wallmanager.business.worker.WorkerService;
@@ -30,14 +30,16 @@ public class ProfileEditorController extends WMController implements ProfileEdit
 	private final EventService eventService;
 	private final ProfileService profileService;
 	private final WorkerService workerService;
+	private final PlatformService platformService;
 	
 	private DesktopEditorPanel panel;
 	
 	@Inject
-	public ProfileEditorController(final EventService eventService, final ProfileService profileService, final WorkerService workerService) {
+	public ProfileEditorController(final EventService eventService, final ProfileService profileService, final WorkerService workerService, final PlatformService platformService) {
 		this.eventService = eventService;
 		this.profileService = profileService;
 		this.workerService = workerService;
+		this.platformService = platformService;
 	}
 	
 	public void setPanel(DesktopEditorPanel panel) {
@@ -137,7 +139,7 @@ public class ProfileEditorController extends WMController implements ProfileEdit
 				final BufferedImage wallpaper = GraphicsUtilities.generateProfileWallpaper(profile, version);
 				
 				// output folder (create if necessary)
-				Path outFolder = Platforms.get().getAppDirectory().resolve("wallpapers");
+				Path outFolder = platformService.getAppDirectory().resolve("wallpapers");
 				
 				if (Files.notExists(outFolder)) {
 					Files.createDirectories(outFolder);
@@ -149,7 +151,7 @@ public class ProfileEditorController extends WMController implements ProfileEdit
 				ImageIO.write(wallpaper, "PNG", wallpaperFile);
 				
 				// Set wallpaper on desktop
-				Platforms.get().setWallpaper(wallpaperFile);
+				platformService.setWallpaper(wallpaperFile);
 			}
 			
 			return null;

@@ -1,4 +1,4 @@
-package info.seravee.wallcreator.platform;
+package info.seravee.wallmanager.business.platform;
 
 import java.io.File;
 import java.io.IOException;

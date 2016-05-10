@@ -7,7 +7,6 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
-import info.seravee.wallcreator.platform.Platforms;
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.beans.profile.Screen;
@@ -15,11 +14,15 @@ import info.seravee.wallmanager.beans.profile.WallpaperParameters;
 import info.seravee.wallmanager.business.dao.ProfileDao;
 import info.seravee.wallmanager.business.exception.NoDataFoundException;
 import info.seravee.wallmanager.business.exception.profile.NameAlreadyUsedException;
+import info.seravee.wallmanager.business.platform.PlatformService;
 
 public class ProfileManager implements ProfileService {
 
 	@Inject
 	private ProfileDao profileDao;
+	
+	@Inject
+	private PlatformService platformService;
 
 	@Override
 	public List<Profile> list() {
@@ -69,7 +72,7 @@ public class ProfileManager implements ProfileService {
 		
 		Profile profile = new Profile();
 		profile.setName(name);
-		profile.setConfiguration(Platforms.get().getDesktopConfiguration());
+		profile.setConfiguration(platformService.getDesktopConfiguration());
 		
 		// Create default version
 		ProfileVersion version = new ProfileVersion();

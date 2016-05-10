@@ -2,14 +2,20 @@ package info.seravee.wallmanager.business.dao.yaml;
 
 import java.nio.file.Path;
 
-import info.seravee.wallcreator.platform.Platforms;
+import com.google.inject.Inject;
+
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.business.dao.ProfileDao;
+import info.seravee.wallmanager.business.platform.PlatformService;
 
 public class ProfileDaoYamlImpl extends AbstractYamlStore<Profile> implements ProfileDao {
+	
+	private final PlatformService platformService; 
 
-	public ProfileDaoYamlImpl() {
+	@Inject
+	public ProfileDaoYamlImpl(PlatformService platformService) {
 		super(new ProfileContructor(), new ProfileRepresenter());
+		this.platformService = platformService;
 	}
 	
 	@Override
@@ -20,6 +26,6 @@ public class ProfileDaoYamlImpl extends AbstractYamlStore<Profile> implements Pr
 
 	@Override
 	protected Path getStoreLocation() {
-		return Platforms.get().getAppDirectory().resolve("profiles");
+		return platformService.getAppDirectory().resolve("profiles");
 	}
 }

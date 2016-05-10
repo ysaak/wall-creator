@@ -12,8 +12,6 @@ import java.security.MessageDigest;
 
 import javax.imageio.ImageIO;
 
-import info.seravee.wallcreator.platform.Platforms;
-
 public class ThumbnailManager {
 	/**
 	 * 
@@ -78,7 +76,11 @@ public class ThumbnailManager {
 	 * @return
 	 */
 	private static Path getThumbnailPath() {
+		
+		/*
 		return Platforms.get().getAppDirectory().resolve("thumbnails");
+		*/
+		return null;
 	}
 
 	/**

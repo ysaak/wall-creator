@@ -1,4 +1,4 @@
-package info.seravee.wallcreator.platform;
+package info.seravee.wallmanager.business.platform;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -13,7 +13,7 @@ import info.seravee.wallmanager.beans.profile.Screen;
 /**
  * Created by ysaak on 31/01/15.
  */
-abstract class AbstractPlaform implements Platform {
+abstract class AbstractPlaform implements PlatformService {
 	
 	public Path getAppDirectory() {
 		String userHome = System.getProperty("user.home");
