@@ -1,7 +1,6 @@
 package info.seravee.wallmanager.business;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 
 import info.seravee.wallmanager.business.configuration.ConfigurationManager;
 import info.seravee.wallmanager.business.configuration.ConfigurationService;
@@ -12,7 +11,7 @@ import info.seravee.wallmanager.business.dao.yaml.ProfileDaoYamlImpl;
 import info.seravee.wallmanager.business.events.EventManager;
 import info.seravee.wallmanager.business.events.EventService;
 import info.seravee.wallmanager.business.platform.PlatformService;
-import info.seravee.wallmanager.business.platform.WindowsPlatform;
+import info.seravee.wallmanager.business.platform.PlatformServiceProvider;
 import info.seravee.wallmanager.business.profiles.ProfileManager;
 import info.seravee.wallmanager.business.profiles.ProfileService;
 import info.seravee.wallmanager.business.worker.WorkerManager;
@@ -33,10 +32,8 @@ public class ServicesModule extends AbstractModule {
 	protected void configureDaoBinding() {
 		bind(ConfigurationDao.class).to(ConfigurationDaoYamlImpl.class);
 		bind(ProfileDao.class).to(ProfileDaoYamlImpl.class);
+		
+		bind(PlatformService.class).toProvider(PlatformServiceProvider.class);
 	}
 	
-	@Provides
-	protected PlatformService providePlatformService() {
-		return new WindowsPlatform();
-	}
 }
