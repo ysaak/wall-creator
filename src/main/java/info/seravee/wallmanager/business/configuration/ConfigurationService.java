@@ -5,9 +5,8 @@ import info.seravee.wallmanager.beans.Configuration;
 public interface ConfigurationService {
 	/**
 	 * Load stored configuration
-	 * @throws ConfigurationException
 	 */
-	void load() throws ConfigurationException;
+	void load();
 	
 	/**
 	 * Returns configuration

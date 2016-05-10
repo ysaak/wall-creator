@@ -19,7 +19,6 @@ public class ServicesModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		
 		configureDaoBinding();
 		
 		bind(ConfigurationService.class).to(ConfigurationManager.class);
@@ -28,7 +27,7 @@ public class ServicesModule extends AbstractModule {
 		bind(WorkerService.class).to(WorkerManager.class);
 	}
 	
-	private void configureDaoBinding() {
+	protected void configureDaoBinding() {
 		bind(ConfigurationDao.class).to(ConfigurationDaoYamlImpl.class);
 		bind(ProfileDao.class).to(ProfileDaoYamlImpl.class);
 	}

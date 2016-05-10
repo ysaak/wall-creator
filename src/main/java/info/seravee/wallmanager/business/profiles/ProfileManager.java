@@ -1,6 +1,7 @@
 package info.seravee.wallmanager.business.profiles;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Preconditions;
@@ -23,6 +24,10 @@ public class ProfileManager implements ProfileService {
 	@Override
 	public List<Profile> list() {
 		List<Profile> profiles = profileDao.list();
+		
+		if (profiles == null) {
+			profiles = new ArrayList<>();
+		}
 
 		if (profiles.size() == 0) {
 			// No profile defined, create a default one
@@ -54,9 +59,11 @@ public class ProfileManager implements ProfileService {
 		
 		// Check for profile name unicity
 		List<Profile> existingProfiles = profileDao.list();
-		for (Profile p : existingProfiles) {
-			if (p.getName().equalsIgnoreCase(name)) {
-				throw new NameAlreadyUsedException("The name '" + name + "' is already used");
+		if (existingProfiles != null) {
+			for (Profile p : existingProfiles) {
+				if (p.getName().equalsIgnoreCase(name)) {
+					throw new NameAlreadyUsedException("The name '" + name + "' is already used");
+				}
 			}
 		}
 		

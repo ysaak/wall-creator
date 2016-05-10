@@ -10,22 +10,28 @@ import info.seravee.wallmanager.business.exception.NoDataFoundException;
 @Singleton
 public class ConfigurationManager implements ConfigurationService {
 
-	private Configuration currentConfig = new Configuration();
+	private Configuration currentConfig = null;
 	
 	@Inject
 	private ConfigurationDao configurationDao;
 	
 	@Override
-	public final void load() throws ConfigurationException {
+	public final void load() {
 		try {
 			currentConfig = configurationDao.get();
 		} catch (NoDataFoundException e) {
-			currentConfig = new Configuration();
+			currentConfig = null;
 		}
+		
+		if (currentConfig == null)
+			currentConfig = new Configuration();
 	}
 	
 	@Override
 	public final Configuration get() {
+		if (currentConfig == null)
+			load();
+		
 		return currentConfig;
 	}
 	
