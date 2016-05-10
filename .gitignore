@@ -9,3 +9,4 @@ wall-creator.iml
 .classpath
 .project
 .settings
+test-output/
