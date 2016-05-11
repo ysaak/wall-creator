@@ -10,8 +10,8 @@ import com.google.inject.Inject;
 
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.business.exception.NoDataFoundException;
+import info.seravee.wallmanager.business.exception.profile.ConfigurationAlreadyUsedException;
 import info.seravee.wallmanager.business.exception.profile.NameAlreadyUsedException;
-import info.seravee.wallmanager.business.exception.profile.ProfileStoreException;
 import info.seravee.wallmanager.business.profiles.ProfileService;
 import wallmanager.TestServiceModule;
 
@@ -26,25 +26,29 @@ public class TestProfileService {
 	}
 
 	@Test
-	public void testListNeverReturnNull() throws ProfileStoreException {
+	public void testListNeverReturnNull() {
 		List<Profile> list = service.list();
 		Assert.assertNotNull(list);
 	}
 	
 	@Test(dependsOnMethods="testListNeverReturnNull")
-	public void testListAlwaysReturnAProfile() throws ProfileStoreException {
+	public void testListAlwaysReturnAProfile() {
 		List<Profile> list = service.list();
 		Assert.assertTrue(list.size() > 0);
 		Assert.assertNotNull(list.get(0));
 	}
 	
 	@Test(dependsOnMethods="testListNeverReturnNull", expectedExceptions = { NameAlreadyUsedException.class })
-	public void testCannotAddProfileWithSameName() throws ProfileStoreException, NameAlreadyUsedException {
-		service.createProfile("Default");
+	public void testCannotAddProfileWithSameName() throws NameAlreadyUsedException, ConfigurationAlreadyUsedException {
+		List<Profile> list = service.list();
+		Profile listProfile = list.get(0);
+		
+		// Try recreate a profile with the same name
+		service.createProfile(listProfile.getName());
 	}
 	
 	@Test(dependsOnMethods="testListAlwaysReturnAProfile")
-	public void testGetExistingProfile() throws ProfileStoreException, NoDataFoundException {
+	public void testGetExistingProfile() throws NoDataFoundException {
 		
 		List<Profile> list = service.list();
 		Profile listProfile = list.get(0);
@@ -58,5 +62,12 @@ public class TestProfileService {
 	@Test(dependsOnMethods="testListAlwaysReturnAProfile", expectedExceptions = { NoDataFoundException.class })
 	public void testGetNonExistingProfile() throws NoDataFoundException {
 		service.get("xxxx");
+	}
+	
+	@Test(dependsOnMethods="testCannotAddProfileWithSameName", expectedExceptions = { ConfigurationAlreadyUsedException.class })
+	public void testNoDuplicateConfiguration() throws NameAlreadyUsedException, ConfigurationAlreadyUsedException {
+		
+		service.createProfile("New one");
+		
 	}
 }

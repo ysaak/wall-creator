@@ -13,6 +13,7 @@ import info.seravee.wallmanager.beans.profile.Screen;
 import info.seravee.wallmanager.beans.profile.WallpaperParameters;
 import info.seravee.wallmanager.business.dao.ProfileDao;
 import info.seravee.wallmanager.business.exception.NoDataFoundException;
+import info.seravee.wallmanager.business.exception.profile.ConfigurationAlreadyUsedException;
 import info.seravee.wallmanager.business.exception.profile.NameAlreadyUsedException;
 import info.seravee.wallmanager.business.platform.PlatformService;
 
@@ -38,7 +39,7 @@ public class ProfileManager implements ProfileService {
 			try {
 				defaultProfile = createProfile("Default");
 				profiles.add(defaultProfile);
-			} catch (NameAlreadyUsedException e) {
+			} catch (NameAlreadyUsedException | ConfigurationAlreadyUsedException e) {
 				// Should not append since no profile exists
 			}
 		}
@@ -58,7 +59,9 @@ public class ProfileManager implements ProfileService {
 	/* --- Profile's actions --- */
 	
 	@Override
-	public Profile createProfile(String name/*, List<Screen> desktopConfiguration*/) throws NameAlreadyUsedException {
+	public Profile createProfile(String name/*, List<Screen> desktopConfiguration*/) throws NameAlreadyUsedException, ConfigurationAlreadyUsedException {
+		
+		List<Screen> configuration = platformService.getDesktopConfiguration();
 		
 		// Check for profile name unicity
 		List<Profile> existingProfiles = profileDao.list();
@@ -67,12 +70,17 @@ public class ProfileManager implements ProfileService {
 				if (p.getName().equalsIgnoreCase(name)) {
 					throw new NameAlreadyUsedException("The name '" + name + "' is already used");
 				}
+				
+				// Check configuration already exists
+				if (checkConfigurationExists(p.getConfiguration(), configuration)) {
+					throw new ConfigurationAlreadyUsedException("This configuration is already used");
+				}
 			}
 		}
 		
 		Profile profile = new Profile();
 		profile.setName(name);
-		profile.setConfiguration(platformService.getDesktopConfiguration());
+		profile.setConfiguration(configuration);
 		
 		// Create default version
 		ProfileVersion version = new ProfileVersion();
@@ -89,6 +97,43 @@ public class ProfileManager implements ProfileService {
 		profile.getVersions().add(version);
 		
 		return store(profile);
+	}
+	
+	private boolean checkConfigurationExists(List<Screen> aList, List<Screen> bList) {
+		// Two lists are null > OK
+		if (aList == null && bList == null)
+			return true;
+		// One of the list is null > KO
+		if (aList == null || bList == null)
+			return false;
+		
+		// Lists have the same size
+		if (aList.size() == bList.size()) {
+			final List<Screen> workList = new ArrayList<>(bList);
+			
+			for (Screen screen : aList) {
+				
+				boolean found = false;
+				
+				for (int i=0; i<workList.size(); i++) {
+					if (screen.equals(workList.get(i))) {
+						workList.remove(i);
+						found = true;
+						break;
+					}
+				}
+				
+				if (!found) {
+					// Element not found
+					return false;
+				}
+			}
+
+			// All elements found
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/* --- Versions --- */

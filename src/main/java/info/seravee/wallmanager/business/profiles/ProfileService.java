@@ -6,24 +6,22 @@ import java.util.List;
 import info.seravee.wallmanager.beans.profile.Profile;
 import info.seravee.wallmanager.beans.profile.ProfileVersion;
 import info.seravee.wallmanager.business.exception.NoDataFoundException;
+import info.seravee.wallmanager.business.exception.profile.ConfigurationAlreadyUsedException;
 import info.seravee.wallmanager.business.exception.profile.NameAlreadyUsedException;
-import info.seravee.wallmanager.business.exception.profile.ProfileStoreException;
 
 public interface ProfileService {
 	/**
 	 * List stored profiles
 	 * @return
-	 * @throws ProfileStoreException 
 	 */
-	List<Profile> list() throws ProfileStoreException;
+	List<Profile> list();
 	
 	/**
 	 * Store a profile
 	 * @param profile
 	 * @return 
-	 * @throws ProfileStoreException 
 	 */
-	Profile store(Profile profile) throws ProfileStoreException;
+	Profile store(Profile profile);
 	
 	/**
 	 * 
@@ -39,10 +37,10 @@ public interface ProfileService {
 	 * Create a new profile with the specified name based on the current configuration
 	 * @param name New profile name
 	 * @return new profile
-	 * @throws ProfileStoreException
 	 * @throws NameAlreadyUsedException 
+	 * @throws ConfigurationAlreadyUsedException 
 	 */
-	Profile createProfile(String name) throws ProfileStoreException, NameAlreadyUsedException;
+	Profile createProfile(String name) throws NameAlreadyUsedException, ConfigurationAlreadyUsedException;
 	
 	
 	/* --- Versions --- */
