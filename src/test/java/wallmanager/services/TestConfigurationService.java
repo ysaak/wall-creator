@@ -6,9 +6,9 @@ import org.testng.annotations.Test;
 
 import com.google.inject.Inject;
 
-import info.seravee.wallmanager.beans.Configuration;
-import info.seravee.wallmanager.business.configuration.ConfigurationService;
 import wallmanager.TestServiceModule;
+import wallmanager.beans.Configuration;
+import wallmanager.business.configuration.ConfigurationService;
 
 @Guice(modules = TestServiceModule.class)
 public class TestConfigurationService {

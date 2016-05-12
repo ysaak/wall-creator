@@ -3,9 +3,9 @@ package wallmanager.mock.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import info.seravee.wallmanager.beans.profile.Profile;
-import info.seravee.wallmanager.business.dao.ProfileDao;
-import info.seravee.wallmanager.business.exception.NoDataFoundException;
+import wallmanager.beans.profile.Profile;
+import wallmanager.business.dao.ProfileDao;
+import wallmanager.business.exception.NoDataFoundException;
 
 public class InMemoryProfileDao implements ProfileDao {
 	

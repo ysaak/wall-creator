@@ -1,8 +1,8 @@
 package wallmanager.mock.dao;
 
-import info.seravee.wallmanager.beans.Configuration;
-import info.seravee.wallmanager.business.dao.ConfigurationDao;
-import info.seravee.wallmanager.business.exception.NoDataFoundException;
+import wallmanager.beans.Configuration;
+import wallmanager.business.dao.ConfigurationDao;
+import wallmanager.business.exception.NoDataFoundException;
 
 public class InMemoryConfigurationDao implements ConfigurationDao {
 

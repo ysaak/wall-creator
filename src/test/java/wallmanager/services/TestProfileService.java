@@ -8,12 +8,12 @@ import org.testng.annotations.Test;
 
 import com.google.inject.Inject;
 
-import info.seravee.wallmanager.beans.profile.Profile;
-import info.seravee.wallmanager.business.exception.NoDataFoundException;
-import info.seravee.wallmanager.business.exception.profile.ConfigurationAlreadyUsedException;
-import info.seravee.wallmanager.business.exception.profile.NameAlreadyUsedException;
-import info.seravee.wallmanager.business.profiles.ProfileService;
 import wallmanager.TestServiceModule;
+import wallmanager.beans.profile.Profile;
+import wallmanager.business.exception.ConfigurationAlreadyUsedException;
+import wallmanager.business.exception.NameAlreadyUsedException;
+import wallmanager.business.exception.NoDataFoundException;
+import wallmanager.business.profile.ProfileService;
 
 @Guice(modules = TestServiceModule.class)
 public class TestProfileService {

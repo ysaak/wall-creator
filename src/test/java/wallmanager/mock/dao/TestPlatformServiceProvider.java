@@ -9,8 +9,8 @@ import java.util.List;
 
 import com.google.inject.Provider;
 
-import info.seravee.wallmanager.beans.profile.Screen;
-import info.seravee.wallmanager.business.platform.PlatformService;
+import wallmanager.beans.profile.Screen;
+import wallmanager.business.platform.PlatformService;
 
 public class TestPlatformServiceProvider implements Provider<PlatformService> {
 	@Override

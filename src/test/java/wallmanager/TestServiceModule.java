@@ -1,10 +1,10 @@
 package wallmanager;
 import com.google.inject.Singleton;
 
-import info.seravee.wallmanager.business.ServicesModule;
-import info.seravee.wallmanager.business.dao.ConfigurationDao;
-import info.seravee.wallmanager.business.dao.ProfileDao;
-import info.seravee.wallmanager.business.platform.PlatformService;
+import wallmanager.business.ServicesModule;
+import wallmanager.business.dao.ConfigurationDao;
+import wallmanager.business.dao.ProfileDao;
+import wallmanager.business.platform.PlatformService;
 import wallmanager.mock.dao.InMemoryConfigurationDao;
 import wallmanager.mock.dao.InMemoryProfileDao;
 import wallmanager.mock.dao.TestPlatformServiceProvider;
